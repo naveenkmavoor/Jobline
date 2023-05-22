@@ -1,8 +1,9 @@
-// qfEplOjttCeI4mLo
 const express = require("express");
 require("dotenv").config();
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth");
+const timelineRoutes = require("./routes/timeline");
+const statusRoute = require("./routes/status");
 const app = express();
 const cookieParser = require("cookie-parser");
 
@@ -17,7 +18,7 @@ db.on("connected", () => {
 });
 db.on("error", () => {
   console.log("Connection Failed");
-  throw "error";
+  // throw "error";
 });
 db.on("disconnected", () => {
   console.log("Database Disconnected");
@@ -25,17 +26,20 @@ db.on("disconnected", () => {
 
 app.use(cookieParser());
 app.use(express.json());
+
 app.use("/api/auth", authRoutes);
+app.use("/api", timelineRoutes);
+app.use("/api/user", statusRoute);
 
 //Error Handeling Middleware
 app.use((err, req, res, next) => {
   const errorStatus = err.status || 500;
   const errorMessage = err.message || "Something went wrong";
   return res.status(errorStatus).json({
-      success: false,
-      status: errorStatus,
-      message: errorMessage,
-      stack: err.stack,
+    success: false,
+    status: errorStatus,
+    message: errorMessage,
+    stack: err.stack,
   });
 });
 

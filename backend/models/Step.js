@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const stepSchema = new mongoose.Schema({
   name: {
     type: String,
-    require: true,
+    required: true,
   },
   description: {
     type: String,
@@ -17,6 +17,14 @@ const stepSchema = new mongoose.Schema({
   },
   avatar: {
     type: String, // avatar of every step
+  },
+  timelineId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Recruiter",
+    required: true,
+  },
+  order: {
+    type: Number,
   },
 });
 

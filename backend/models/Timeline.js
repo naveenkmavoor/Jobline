@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const TimelineSchema = new mongoose.Schema({
-  recruiter: {
+  recruiterId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Recruiter",
     required: true,
