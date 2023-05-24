@@ -57,14 +57,17 @@ const getUserStatus = async (req, res, next) => {
 
     const userStatus = await Status.find({ email });
 
-    console.log(userStatus[0].timelineId.valueOf());
+    // console.log(userStatus[0].timelineId.valueOf());
 
     // if toggle is off -> private
     if (userStatus[0].timelineId.valueOf() !== req.params.id) {
       res.send("not authorized to see");
     }
-
-    res.status(201).json(userStatus);
+    const stepId = userStatus[0].stepId.valueOf();
+    const step = await Step.findById(stepId)
+    const stepNumber = step.order;
+    
+    res.status(201).json({userStatus, stepNumber});
   } catch (error) {
     next(error);
   }

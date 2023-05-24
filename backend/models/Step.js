@@ -8,9 +8,6 @@ const stepSchema = new mongoose.Schema({
   description: {
     type: String,
   },
-  information_link: {
-    type: String,
-  },
   eta: {
     type: Number,
     default: 3,
