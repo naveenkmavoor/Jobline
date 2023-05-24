@@ -51,23 +51,29 @@ const addUserStatus = async (req, res, next) => {
 
 const getUserStatus = async (req, res, next) => {
   try {
-    const id = req.user.id;
-    const user = await User.findById(id);
+    const userId = req.user.id;
+    const timelineId = req.params.id;
+
+    // Check if the user is associated 
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).send("User not associated ");
+    }
+
     const email = user.email;
 
-    const userStatus = await Status.find({ email });
-
-    // console.log(userStatus[0].timelineId.valueOf());
-
-    // if toggle is off -> private
-    if (userStatus[0].timelineId.valueOf() !== req.params.id) {
-      res.send("not authorized to see");
+    // Retrieve the status document for the specified timeline and email
+    const status = await Status.findOne({ timelineId, email });
+    if (!status) {
+      return res.send("Status not found for the user and timeline");
     }
-    const stepId = userStatus[0].stepId.valueOf();
-    const step = await Step.findById(stepId)
+
+    const stepId = status.stepId;
+    const step = await Step.findById(stepId);
     const stepNumber = step.order;
-    
-    res.status(201).json({userStatus, stepNumber});
+    status.stepIdx = stepNumber;
+    await status.save();
+    res.status(200).json({ status, stepNumber });
   } catch (error) {
     next(error);
   }
