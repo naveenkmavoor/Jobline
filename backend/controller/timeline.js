@@ -130,10 +130,23 @@ const deleteStep = async (req, res, next) => {
   }
 };
 
+const getAllTimelines = async(req,res,next)=>{
+  try {
+    const id = req.user.id;
+    const timeline = await TimeLine.find({recruiterId : id});
+
+    return res.status(201).send(timeline);
+
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   createTimeLine,
   addSteps,
   getTimeLine,
   deleteTimeline,
   deleteStep,
+  getAllTimelines
 };
