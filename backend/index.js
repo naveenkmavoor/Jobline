@@ -28,7 +28,7 @@ db.on("disconnected", () => {
 //middlewares
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "https://deluxe-gelato-829e45.netlify.app",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
