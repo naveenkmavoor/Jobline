@@ -9,11 +9,15 @@ class DioClient {
   static final DioClient _singleton = DioClient._internal();
 
   DioClient._internal() {
-    final String baseUrl = "https://jobline-f7wz6hu4l-bhavisshyya.vercel.app/";
+    const String baseUrl = "https://jobline-serverz.vercel.app/";
     final cookieJar = CookieJar();
     _dio
           ..options.baseUrl = baseUrl
           ..options.extra["withCredentials"] = true
+          ..options.headers = {
+            'content-type': 'application/json',
+            'Connection': 'keep-alive'
+          }
           ..options.connectTimeout = 60 * 1000
           ..options.receiveTimeout = 60 * 1000
           ..interceptors.add(
