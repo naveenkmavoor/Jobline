@@ -26,11 +26,22 @@ db.on("disconnected", () => {
 });
 
 //middlewares
+// app.use(
+//   cors({
+//     origin: "https://deluxe-gelato-829e45.netlify.app",
+//     methods: ["GET", "POST", "PUT", "DELETE"],
+//     credentials: true,
+//   })
+// );
+
 app.use(
   cors({
-    origin: "https://deluxe-gelato-829e45.netlify.app",
+    origin: "*",                //just want to make sure if it's working 
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
+  //add the below two lines as well 
+    secure: true,
+    sameSite: 'none'
   })
 );
 
