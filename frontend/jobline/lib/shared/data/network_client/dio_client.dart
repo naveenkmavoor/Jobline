@@ -13,6 +13,7 @@ class DioClient {
     final cookieJar = CookieJar();
     _dio
           ..options.baseUrl = baseUrl
+          ..options.extra["withCredentials"] = true
           ..options.connectTimeout = 60 * 1000
           ..options.receiveTimeout = 60 * 1000
           ..interceptors.add(
