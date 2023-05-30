@@ -16,13 +16,13 @@ class DioExceptions implements Exception {
       case DioErrorType.receiveTimeout:
         message = "Receive timeout in connection with API server";
         break;
-      // case DioErrorType.response:
-      //   message = _handleError(
-      //     statusCode: dioError.response?.statusCode,
-      //     error: dioError.response?.data,
-      //     isAuthentication: isAuthentication,
-      //   );
-      //   break;
+      case DioErrorType.response:
+        message = _handleError(
+          statusCode: dioError.response?.statusCode,
+          error: dioError.response?.data,
+          isAuthentication: isAuthentication,
+        );
+        break;
       case DioErrorType.sendTimeout:
         message = "Send timeout in connection with API server";
         break;
@@ -43,19 +43,21 @@ class DioExceptions implements Exception {
 //?isAuthentication refers to login and signup.
   String _handleError(
       {int? statusCode, dynamic error, bool isAuthentication = false}) {
-    if (isAuthentication) {
-      if (error['errors'][0]['type'] != "") {
-        return error['errors'][0]['type'];
-      } else if (error['msg'] != "") {
-        return error['msg'];
-      } else {
-        return Constants.somethingWentWrong;
-      }
-    } else if (error['msg'] != "" && error['msg'] != null) {
-      return error['msg'];
-    } else {
-      return Constants.somethingWentWrong;
-    }
+    // if (isAuthentication) {
+    //   if (error['errors'][0]['type'] != "") {
+    //     return error['errors'][0]['type'];
+    //   } else if (error['msg'] != "") {
+    //     return error['msg'];
+    //   } else {
+    //     return Constants.somethingWentWrong;
+    //   }
+    // } else if (error['msg'] != "" && error['msg'] != null) {
+    //   return error['msg'];
+    // } else {
+    //   return Constants.somethingWentWrong;
+    // }
+
+    return "Something went wrong!";
 
     // switch (error) {
     //   case 400:

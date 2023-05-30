@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:jobline/shared/data/network_client/dio_client.dart';
 
@@ -72,6 +73,21 @@ class AuthenticationApi {
         'password': password,
       });
       return response;
+
+      // try {
+      //   var cookieJar = CookieJar();
+      //   http.cli
+
+      //   var url = Uri.parse('https://jobline-f7wz6hu4l-bhavisshyya.vercel.app/');
+      //   var response = await http.post(url,
+      //       body: jsonEncode({"email": "bhavi@gmail.com", "password": "1234"}));
+
+      //   if (response.headers.containsKey('set-cookie')) {
+      //     var cookies = response.headers['set-cookie'];
+      //     // process the cookies as needed
+      //   }
+
+      //   return Response(requestOptions: RequestOptions(path: ""));
     } catch (e) {
       rethrow;
     }
