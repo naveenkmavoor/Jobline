@@ -18,18 +18,24 @@ const registerUser = async (req, res, next) => {
     await newUser.save();
 
     // generating token while in registering
-    const token = jwt.sign(
-      { id: newUser._id, role: newUser.role },
-      process.env.JWT_KEY,
-      { expiresIn: "7d" }
-    );
+    // const token = jwt.sign(
+    //   { id: newUser._id, role: newUser.role },
+    //   process.env.JWT_KEY,
+    //   { expiresIn: "7d" }
+    // );
 
-    res
-      .cookie("access_token", token, {
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      })
-      .status(201)
-      .json({ ...req.body });
+    const token = newUser.createJWT();
+
+    res.status(201).json({
+      success: true,
+      message: "user registered",
+      user: {
+        name: newUser.name,
+        email: newUser.email,
+        location: newUser.location,
+        token,
+      },
+    });
   } catch (error) {
     return res.send(error);
   }
@@ -41,7 +47,7 @@ const loginUser = async (req, res, next) => {
 
     const checkUser = await User.findOne({ email });
     if (!checkUser) return res.status(404).send("Wrong username or password");
-
+  
     if (!req.body.password) {
       return res.status(400).send("Please enter Password");
     }
@@ -53,19 +59,14 @@ const loginUser = async (req, res, next) => {
 
     if (!passCheck) return res.status(400).send("Wrong username or password");
 
-    const token = jwt.sign(
-      { id: checkUser._id, role: checkUser.role },
-      process.env.JWT_KEY
-    );
+    const token = checkUser.createJWT();
 
-    const { password, role, ...others } = checkUser._doc;
-
-    res
-      .cookie("access_token", token, {
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      })
-      .status(200)
-      .json({ ...others, role });
+    res.status(200).json({
+      message: "logged in successfully",
+      success: true,
+      token,
+      checkUser,
+    });
   } catch (error) {
     return res.send(error);
   }
