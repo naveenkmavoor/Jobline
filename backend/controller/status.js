@@ -14,36 +14,28 @@ const addUserStatus = async (req, res, next) => {
       res.send("add correct stepId and timelineId in params");
     }
 
-    const email = req.body.email;
+    const emails = req.body.emails;
 
-    // const user = await User.find({ email });
-    // console.log(user[0]._id.valueOf());
-    // const userId = user._id;
-    // const timeline = await Timeline.find({_id:timelineId});
-    // const step = timeline[0].steps[0];
-    // const stepId = step.valueOf();
-    // console.log(stepId);
+    const statusPromises = emails.map(async (email) => {
+      const existingStatus = await Status.findOne({ email });
 
-    // Check if a document with the same email and timelineId exists
-    const existingStatus = await Status.findOne({ email });
+      if (existingStatus) {
+        existingStatus.timelineId = timelineId;
+        existingStatus.stepId = stepId;
+        await existingStatus.save();
 
-    if (existingStatus) {
-      // Handle the situation where a document with the same email and timelineId already exists
+        return existingStatus;
+      } else {
+        const newStatus = new Status({ email, timelineId, stepId });
+        await newStatus.save();
 
-      existingStatus.timelineId = timelineId;
-      existingStatus.stepId = stepId;
+        return newStatus;
+      }
+    });
 
-      await existingStatus.save();
+    const userStatuses = await Promise.all(statusPromises);
 
-      return res.send(existingStatus);
-    }
-
-    // Create a new Status document
-    const userStatus = new Status({ email, timelineId, stepId });
-    await userStatus.save();
-
-    // res.status(201).send("User added to the timeline");
-    res.send(userStatus);
+    res.send(userStatuses);
   } catch (error) {
     next(error);
   }

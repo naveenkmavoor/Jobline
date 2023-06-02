@@ -1,10 +1,6 @@
 const mongoose = require("mongoose");
 
 const statusSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -29,6 +25,10 @@ const statusSchema = new mongoose.Schema({
     type: String,
     default: "Pending",
   },
+  email:{
+    type:String,
+    unique:false
+  }
 });
 
 const Status = mongoose.model("Status", statusSchema);
