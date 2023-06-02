@@ -36,12 +36,8 @@ db.on("disconnected", () => {
 
 app.use(
   cors({
-    origin: "*",                //just want to make sure if it's working 
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  //add the below two lines as well 
-    secure: true,
-    sameSite: 'none'
+    origin: "*",               
+    methods: ["GET", "POST", "PUT", "DELETE"], 
   })
 );
 
