@@ -1,56 +1,10 @@
-// import 'dart:developer';
-
-// import 'package:dio/dio.dart';
-
-// class Logging extends Interceptor {
-//   @override
-//   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-//     log('REQUEST[${options.method}] => PATH: ${options.path}');
-//     if (options.data != null) log('REQUEST DATA => ${options.data}');
-//     log('REQUEST HEADERS => ${options.headers}');
-//     print('REQUEST[${options.method}] => PATH: ${options.path}');
-//     if (options.data != null) log('REQUEST DATA => ${options.data}');
-//     print('REQUEST HEADERS => [${options.headers}]');
-//     return super.onRequest(options, handler);
-//   }
-
-//   @override
-//   void onResponse(Response response, ResponseInterceptorHandler handler) {
-//     log(
-//       'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}',
-//     );
-//     log('RESPONSE DATA => ${response.data}');
-//     print(
-//       'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}',
-//     );
-//     print('RESPONSE DATA => ${response.data}');
-//     return super.onResponse(response, handler);
-//   }
-
-//   @override
-//   void onError(DioError err, ErrorInterceptorHandler handler) {
-//     log(
-//       'ERROR[${err.response?.statusCode}] => PATH: ${err.requestOptions.path}',
-//     );
-//     log("Error: ${err.response?.data}");
-//     print(
-//       'ERROR[${err.response?.statusCode}] => PATH: ${err.requestOptions.path}',
-//     );
-//     print("Error: ${err.response?.data}");
-//     return super.onError(err, handler);
-//   }
-// }
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
 import 'package:colorize/colorize.dart';
 import 'package:dio/dio.dart';
-import 'package:hive/hive.dart';
-import 'package:jobline/shared/data/authentication/authentication_api.dart';
-import 'package:jobline/shared/data/authentication/authentication_repository.dart';
-import 'package:jobline/shared/data/network_client/dio_client.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 /// A simple dio log interceptor (mainly inspired by the built-in dio
 /// `LogInterceptor`), which has coloring features and json formatting
@@ -99,27 +53,23 @@ class AwesomeDioInterceptor extends QueuedInterceptor {
     bool logRequestTimeout = true,
     void Function(String log)? logger,
   })  : _jsonEncoder = const JsonEncoder.withIndent('  '),
-        // _baseUrl = baseUrl ?? '',
+        _baseUrl = baseUrl ?? '',
         _requestStyle = requestStyle ?? _defaultRequestStyle,
         _responseStyle = responseStyle ?? _defaultResponseStyle,
         _errorStyle = errorStyle ?? _defaultErrorStyle,
         _logRequestHeaders = logRequestHeaders,
-        // _logResponseHeaders = logResponseHeaders,
-        // _logRequestTimeout = logRequestTimeout,
         _logger = logger ?? log;
 
   static const Styles _defaultRequestStyle = Styles.YELLOW;
   static const Styles _defaultResponseStyle = Styles.GREEN;
   static const Styles _defaultErrorStyle = Styles.RED;
 
-  // static String? _token;
-  // static String? _refreshToken;
+  static String? _token;
+  static String? _refreshToken;
 
-  // final String _baseUrl;
+  final String _baseUrl;
   late final JsonEncoder _jsonEncoder;
   late final bool _logRequestHeaders;
-  // late final bool _logResponseHeaders;
-  // late final bool _logRequestTimeout;
   late final void Function(String log) _logger;
 
   late final Styles _requestStyle;
@@ -277,82 +227,85 @@ class AwesomeDioInterceptor extends QueuedInterceptor {
       if (err.response?.statusCode == 401 &&
           err.response?.data['msg'] == "Token Expired") {
         // Request to get the access token.
-        // final String? accessToken = await getAccessToken();
+        final String? accessToken = await getAccessToken();
 
         // Create a Dio instance for network operations with specified configurations.
-        // final _dio = Dio()
-        //   ..options.baseUrl = _baseUrl
-        //   ..options.connectTimeout = 60 * 1000
-        //   ..options.receiveTimeout = 60 * 1000
-        //   ..interceptors.add(PrettyDioLogger(
-        //       requestHeader: true,
-        //       requestBody: true,
-        //       responseBody: true,
-        //       responseHeader: false,
-        //       error: true,
-        //       compact: true,
-        //       maxWidth: 90));
+        final _dio = Dio()
+          ..options.baseUrl = _baseUrl
+          ..options.connectTimeout = 60 * 1000
+          ..options.receiveTimeout = 60 * 1000;
+        // ..interceptors.add(PrettyDioLogger(
+        //     requestHeader: true,
+        //     requestBody: true,
+        //     responseBody: true,
+        //     responseHeader: false,
+        //     error: true,
+        //     compact: true,
+        //     maxWidth: 90)
+        // );
 
         try {
           // If the new access token is different from the old one,
           // replace the old one in the request headers.
-          // if (accessToken != err.requestOptions.headers["Authorization"]) {
-          //   err.requestOptions.headers["Authorization"] = accessToken;
-          //   // Reinitialize request options.
-          //   final opts = new Options(
-          //       method: err.requestOptions.method,
-          //       headers: err.requestOptions.headers);
+          if (accessToken != err.requestOptions.headers["Authorization"]) {
+            err.requestOptions.headers["Authorization"] = accessToken;
+            // Reinitialize request options.
+            final opts = new Options(
+                method: err.requestOptions.method,
+                headers: err.requestOptions.headers);
 
-          //   // Clone and send the request again with the new access token.
-          //   final cloneReq = await _dio.request(err.requestOptions.path,
-          //       options: opts,
-          //       data: err.requestOptions.data,
-          //       queryParameters: err.requestOptions.queryParameters);
+            // Clone and send the request again with the new access token.
+            final cloneReq = await _dio.request(err.requestOptions.path,
+                options: opts,
+                data: err.requestOptions.data,
+                queryParameters: err.requestOptions.queryParameters);
 
-          //   return handler.resolve(cloneReq);
-          // }
+            return handler.resolve(cloneReq);
+          }
 
           // Request to get the refresh token.
-          // final String? refreshToken = await getRefreshToken();
+          final String? refreshToken = await getRefreshToken();
 
-          // // Request to refresh the tokens.
-          // final Response responseData = await _dio.post(
-          //     '/api/auth/v1/refresh-token',
-          //     data: {"refreshToken": refreshToken});
+          // Request to refresh the tokens.
+          final Response responseData = await _dio.post(
+              '/api/auth/v1/refresh-token',
+              data: {"refreshToken": refreshToken});
 
-          // // If token refresh was successful,
-          // if (responseData.statusCode == 200 ||
-          //     responseData.statusCode == 201) {
-          //   // Log the new access and refresh tokens.
-          //   print("access token" + responseData.data['accessToken']);
-          //   print("refresh token" + responseData.data['refreshToken']);
+          // If token refresh was successful,
+          if (responseData.statusCode == 200 ||
+              responseData.statusCode == 201) {
+            // Log the new access and refresh tokens.
+            print("access token" + responseData.data['accessToken']);
+            print("refresh token" + responseData.data['refreshToken']);
 
-          //   // Set the new access token in the request headers.
-          //   err.requestOptions.headers["Authorization"] =
-          //       responseData.data['accessToken'];
-          //   // Reinitialize request options.
-          //   final opts = new Options(
-          //       method: err.requestOptions.method,
-          //       headers: err.requestOptions.headers);
+            // Set the new access token in the request headers.
+            err.requestOptions.headers["Authorization"] =
+                responseData.data['accessToken'];
+            // Reinitialize request options.
+            final opts = new Options(
+                method: err.requestOptions.method,
+                headers: err.requestOptions.headers);
 
-          //   // Clone and send the request again with the new access token.
-          //   final cloneReq = await _dio.request(err.requestOptions.path,
-          //       options: opts,
-          //       data: err.requestOptions.data,
-          //       queryParameters: err.requestOptions.queryParameters);
+            // Clone and send the request again with the new access token.
+            final cloneReq = await _dio.request(err.requestOptions.path,
+                options: opts,
+                data: err.requestOptions.data,
+                queryParameters: err.requestOptions.queryParameters);
 
-          //   // Update the stored tokens with the new ones.
-          //   await updateTokens(responseData.data);
+            // Update the stored tokens with the new ones.
+            await updateTokens(responseData.data);
 
-          //   return handler.resolve(cloneReq);
-          // }
+            return handler.resolve(cloneReq);
+          }
         } on DioError catch (e) {
           // If the refresh token is invalid, log the error and log out.
           if (e.response?.statusCode == 401 &&
               e.response?.data['msg'] == "invalid_refresh_token") {
             _logError(err, style: _errorStyle);
             // Log out.
-            await AuthenticationRepository().logOut();
+            // await AuthenticationRepository(
+            //         AuthenticationApi(dioClient: DioClient()))
+            // .logOut();
             return handler.reject(err);
           }
         }
@@ -369,18 +322,15 @@ class AwesomeDioInterceptor extends QueuedInterceptor {
   @override
   Future<void> onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
-    //pass the cookies stored in the hive db
-    // options.headers["Authorization"] = getToken();
+    final token = getToken();
+    if (token != null) {
+      options.headers["Authorization"] = 'Bearer $token';
+    }
 
     //console log texts
     _logRequest(options, style: _requestStyle);
     _logNewLine();
-    // Get cookies from storage
-    String? cookies = Hive.box('appBox').get(
-        'cookies'); // Implement this method to retrieve cookies from your storage mechanism
 
-    // Add cookies to request headers
-    if (cookies != null) options.headers['Cookie'] = cookies;
     handler.next(options);
   }
 
@@ -389,49 +339,42 @@ class AwesomeDioInterceptor extends QueuedInterceptor {
       Response response, ResponseInterceptorHandler handler) async {
     _logResponse(response, style: _responseStyle);
     _logNewLine();
-    // Get cookies from response headers
-    // String? rawCookies = response.headers['set-cookie'] as String?;
-
-    // Store cookies in storage
-    // Hive.box('appBox').put("cookies",
-    //     rawCookies); // Implement this method to store cookies in your storage mechanism
-
     handler.next(response);
   }
 
-  // Future<void> updateTokens(Map<String, dynamic> responseData) async {
-  //   resetToken();
-  //   await Hive.box('appBox').putAll({
-  //     "token": responseData['accessToken'] as String?,
-  //     "refreshToken": responseData['refreshToken'] as String?
-  //   });
-  //   _token = responseData['accessToken'] as String?;
-  //   _refreshToken = responseData['refreshToken'] as String?;
-  //   final token = Hive.box('appBox').get("token");
-  //   final refresh = Hive.box('appBox').get("refreshToken");
-  //   print("$token, $refresh");
-  // }
+  Future<void> updateTokens(Map<String, dynamic> responseData) async {
+    resetToken();
+    await Hive.box('appBox').putAll({
+      "token": responseData['accessToken'] as String?,
+      "refreshToken": responseData['refreshToken'] as String?
+    });
+    _token = responseData['accessToken'] as String?;
+    _refreshToken = responseData['refreshToken'] as String?;
+    final token = Hive.box('appBox').get("token");
+    final refresh = Hive.box('appBox').get("refreshToken");
+    print("$token, $refresh");
+  }
 
-  // static String? getToken() {
-  //   if (_token != null) return _token;
-  //   _token = Hive.box('appBox').get("token");
-  //   return _token;
-  // }
+  static String? getToken() {
+    if (_token != null) return _token;
+    _token = Hive.box('appBox').get("token");
+    return _token;
+  }
 
-  // static Future<String?> getRefreshToken() async {
-  //   if (_refreshToken != null) return _refreshToken;
-  //   _refreshToken = await Hive.box('appBox').get("refreshToken");
-  //   return _refreshToken;
-  // }
+  static Future<String?> getRefreshToken() async {
+    if (_refreshToken != null) return _refreshToken;
+    _refreshToken = await Hive.box('appBox').get("refreshToken");
+    return _refreshToken;
+  }
 
-  // static Future<String?> getAccessToken() async {
-  //   if (_token != null) return _token;
-  //   _token = await Hive.box('appBox').get("token");
-  //   return _token;
-  // }
+  static Future<String?> getAccessToken() async {
+    if (_token != null) return _token;
+    _token = await Hive.box('appBox').get("token");
+    return _token;
+  }
 
   static resetToken() {
-    // _token = null;
-    // _refreshToken = null;
+    _token = null;
+    _refreshToken = null;
   }
 }

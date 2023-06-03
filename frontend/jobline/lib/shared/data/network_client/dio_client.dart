@@ -1,7 +1,5 @@
 import 'dart:developer';
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:jobline/shared/data/network_client/dio_interceptors.dart';
 
 class DioClient {
@@ -9,20 +7,17 @@ class DioClient {
   static final DioClient _singleton = DioClient._internal();
 
   DioClient._internal() {
-    const String baseUrl = "https://jobline-serverz.vercel.app/";
-    final cookieJar = CookieJar();
+    // const String baseUrl =
+    //     "https://jobline-server.jgxys75xs-bhavisshyya.vercel.app";
+    const String baseUrl = "https://jobline-9fv2ivz9c-bhavisshyya.vercel.app";
+
     _dio
           ..options.baseUrl = baseUrl
-          ..options.extra["withCredentials"] = true
           ..options.headers = {
-            'content-type': 'application/json',
-            'Connection': 'keep-alive'
+            'Content-Type': 'application/json',
           }
           ..options.connectTimeout = 60 * 1000
           ..options.receiveTimeout = 60 * 1000
-          ..interceptors.add(
-            CookieManager(cookieJar),
-          )
           ..interceptors.add(
             AwesomeDioInterceptor(baseUrl: baseUrl),
           ) // create a new Dio instance

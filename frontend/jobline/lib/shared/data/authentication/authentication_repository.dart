@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:hive/hive.dart';
 import 'package:jobline/shared/data/authentication/authentication_api.dart';
+import 'package:jobline/shared/data/authentication/models/user.dart';
 import 'package:jobline/shared/data/network_client/dio_client.dart';
 import 'package:jobline/shared/data/network_client/dio_exception.dart';
 
@@ -11,9 +13,15 @@ import 'package:jobline/shared/data/network_client/dio_exception.dart';
 /// {@endtemplate}
 class AuthenticationRepository {
   final AuthenticationApi authenticationApi = AuthenticationApi();
+  User? _user;
   final DioClient dio = DioClient();
 
   AuthenticationRepository();
+
+  User get user {
+    //todo: fetch from hive and if empty then User.empty
+    return _user ?? User.empty;
+  }
 
   /// Creates a new user with the provided[name], [email] and [password].
   ///
@@ -25,14 +33,27 @@ class AuthenticationRepository {
       required String password}) async {
     try {
       final response = await authenticationApi.signUpApi(
-        fname: fname,
+        name: fname,
         email: eMail,
         role: role,
         password: password,
       );
-      print(response);
+      _user = User(
+          accType: response.data['checkUser']['role'] == 'recruiter'
+              ? AccType.recruiter
+              : AccType.candidate,
+          email: response.data['checkUser']['email'],
+          id: response.data['checkUser']['_id'],
+          name: response.data['checkUser']['name'],
+          token: response.data['token']);
 
-      print('repo response ${response.data}');
+      Hive.box('appBox').putAll({
+        'accType': response.data['checkUser']['role'],
+        'email': response.data['checkUser']['email'],
+        'id': response.data['checkUser']['_id'],
+        'name': response.data['checkUser']['name'],
+        'token': response.data['token']
+      });
     } on DioError catch (e) {
       throw DioExceptions.fromDioError(e, isAuthentication: true);
     }
@@ -77,6 +98,22 @@ class AuthenticationRepository {
         email: email,
         password: password,
       );
+      _user = User(
+          accType: response.data['checkUser']['role'] == 'recruiter'
+              ? AccType.recruiter
+              : AccType.candidate,
+          email: response.data['checkUser']['email'],
+          id: response.data['checkUser']['_id'],
+          name: response.data['checkUser']['name'],
+          token: response.data['token']);
+
+      Hive.box('appBox').putAll({
+        'accType': response.data['checkUser']['role'],
+        'email': response.data['checkUser']['email'],
+        'id': response.data['checkUser']['_id'],
+        'name': response.data['checkUser']['name'],
+        'token': response.data['token']
+      });
 
       print('repo response ${response.data}');
 

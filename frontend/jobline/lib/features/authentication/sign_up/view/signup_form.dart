@@ -6,7 +6,7 @@ import 'package:jobline/colors.dart';
 import 'package:jobline/config/constants.dart';
 import 'package:jobline/features/authentication/sign_up/cubit/sign_up_cubit.dart';
 import 'package:jobline/router.dart';
-import 'package:jobline/shared/data/authentication/form_inputs/email.dart';
+import 'package:jobline/shared/data/authentication/models/form_inputs/email.dart';
 import 'package:jobline/widgets/custom_alert_dialog.dart';
 import 'package:jobline/widgets/custom_button.dart';
 import 'package:jobline/widgets/custom_snackbar.dart';
@@ -180,9 +180,8 @@ class _SignUpFormState extends State<SignUpForm> {
           customSnackBar(
               context: context,
               snackBarType: SnackBarType.info,
-              title:
-                  "You have successfully created an account. Login back to continue");
-          return context.goNamed('login');
+              title: "Account creation successful.");
+          return context.goNamed('timeline');
         }
       },
       child: SingleChildScrollView(

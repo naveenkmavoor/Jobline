@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
+
 import 'package:jobline/shared/data/network_client/dio_client.dart';
 
 class AuthenticationApi {
@@ -13,7 +13,7 @@ class AuthenticationApi {
   ///
   /// Throws a [SignUpWithEmailAndPasswordFailure] if an exception occurs.
   Future<Response> signUpApi(
-      {required String fname,
+      {required String name,
       required String email,
       required String role,
       required String password}) async {
@@ -21,7 +21,7 @@ class AuthenticationApi {
       final Response response = await dioClient.post(
         '/api/auth/register',
         data: {
-          'name': fname,
+          'name': name,
           'email': email,
           'role': role,
           'password': password,
@@ -68,26 +68,27 @@ class AuthenticationApi {
     required String password,
   }) async {
     try {
-      final Response response = await dioClient.post('/api/auth/login', data: {
-        'email': email,
-        'password': password,
-      });
+      final Response response = await dioClient.post('/api/auth/login',
+          data: json.encode({
+            'email': email,
+            'password': password,
+          }));
+
       return response;
 
-      // try {
-      //   var cookieJar = CookieJar();
-      //   http.cli
+      // // const url = "https://jobline-serverz.vercel.app/api/auth/login";
+      // const url = "http://localhost:8080/api/auth/login";
+      // final ur = Uri.parse(url);
 
-      //   var url = Uri.parse('https://jobline-f7wz6hu4l-bhavisshyya.vercel.app/');
-      //   var response = await http.post(url,
-      //       body: jsonEncode({"email": "bhavi@gmail.com", "password": "1234"}));
+      // var response = await http.post(ur,
+      //     body: json.encode({"email": email, "password": password}),
+      //     headers: {'Content-Type': "application/json"});
+      // print("data");
+      // print(response);
 
-      //   if (response.headers.containsKey('set-cookie')) {
-      //     var cookies = response.headers['set-cookie'];
-      //     // process the cookies as needed
-      //   }
+      // print(response.body);
 
-      //   return Response(requestOptions: RequestOptions(path: ""));
+      // return Response(requestOptions: RequestOptions(path: ""));
     } catch (e) {
       rethrow;
     }

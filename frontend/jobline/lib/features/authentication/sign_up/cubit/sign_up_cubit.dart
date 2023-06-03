@@ -2,9 +2,9 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 import 'package:jobline/shared/data/authentication/authentication_repository.dart';
-import 'package:jobline/shared/data/authentication/form_inputs/email.dart';
-import 'package:jobline/shared/data/authentication/form_inputs/fname.dart';
-import 'package:jobline/shared/data/authentication/form_inputs/password.dart';
+import 'package:jobline/shared/data/authentication/models/form_inputs/email.dart';
+import 'package:jobline/shared/data/authentication/models/form_inputs/fname.dart';
+import 'package:jobline/shared/data/authentication/models/form_inputs/password.dart';
 
 part 'sign_up_state.dart';
 

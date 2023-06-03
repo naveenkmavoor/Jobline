@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:jobline/features/authentication/login/models/login_response.dart';
 import 'package:jobline/shared/data/authentication/authentication_repository.dart';
-import 'package:jobline/shared/data/authentication/form_inputs/email.dart';
-import 'package:jobline/shared/data/authentication/form_inputs/password_login.dart';
+import 'package:jobline/shared/data/authentication/models/form_inputs/email.dart';
+import 'package:jobline/shared/data/authentication/models/form_inputs/password_login.dart';
 
 part 'login_state.dart';
 

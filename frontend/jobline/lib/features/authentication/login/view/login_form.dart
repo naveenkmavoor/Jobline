@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:jobline/colors.dart';
 import 'package:jobline/config/constants.dart';
 import 'package:jobline/features/authentication/login/login.dart';
-import 'package:jobline/shared/data/authentication/form_inputs/email.dart';
+import 'package:jobline/shared/data/authentication/models/form_inputs/email.dart';
 
 import 'package:jobline/widgets/custom_alert_dialog.dart';
 import 'package:jobline/widgets/custom_button.dart';
