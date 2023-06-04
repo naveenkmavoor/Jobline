@@ -1,7 +1,6 @@
 const Step = require("../models/Step");
 const TimeLine = require("../models/Timeline");
 const Status = require("../models/Status");
-const Timeline = require("../models/Timeline");
 
 const createTimeLine = async (req, res, next) => {
   try {
@@ -26,7 +25,7 @@ const addSteps = async (req, res, next) => {
     if (!timeline) {
       return res.status(404).json({ message: "Timeline not found" });
     }
-    const steps = await Step.find({timelineId});
+    const steps = await Step.find({ timelineId });
     if (!timeline.steps) {
       timeline.steps = [];
     }
@@ -59,12 +58,19 @@ const getTimeLine = async (req, res, next) => {
   try {
     const timelineId = req.params.id;
     const timeline = await TimeLine.findById(timelineId);
+
+    if (!timeline) {
+      next("TimelineId is incorrect.");
+    }
+
     let steps = await Step.find({ timelineId });
     const status = await Status.find({ timelineId });
 
     steps.sort((a, b) => a.order - b.order); // sorting the steps
+    const numberOfSteps = steps.length;
+    const jobLink = timeline.jobPostLink;
 
-    res.status(201).send({ timeline, steps, status });
+    res.status(201).send({ timeline, steps, status, numberOfSteps, jobLink });
   } catch (error) {
     next(error);
   }
@@ -130,17 +136,16 @@ const deleteStep = async (req, res, next) => {
   }
 };
 
-const getAllTimelines = async(req,res,next)=>{
+const getAllTimelines = async (req, res, next) => {
   try {
     const id = req.user.id;
-    const timeline = await TimeLine.find({recruiterId : id});
+    const timeline = await TimeLine.find({ recruiterId: id });
 
     return res.status(201).send(timeline);
-
   } catch (error) {
     next(error);
   }
-}
+};
 
 module.exports = {
   createTimeLine,
@@ -148,5 +153,5 @@ module.exports = {
   getTimeLine,
   deleteTimeline,
   deleteStep,
-  getAllTimelines
+  getAllTimelines,
 };
