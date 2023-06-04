@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:jobline/shared/data/network_client/dio_client.dart';
 import 'package:jobline/shared/data/timeline/models/job.dart';
+import 'package:jobline/shared/data/timeline/models/steps.dart';
 
 class TimelineApi {
   final dioClient = DioClient();
@@ -10,7 +11,7 @@ class TimelineApi {
 
   Future<Response> getAllTimeline() async {
     try {
-      final Response response = await dioClient.get('/api/auth/login');
+      final Response response = await dioClient.get('/api');
 
       return response;
     } catch (err) {
@@ -39,10 +40,10 @@ class TimelineApi {
     }
   }
 
-  Future<Response> updateTimeline(String timelineId) async {
+  Future<Response> updateTimeline(List<Steps> steps, String jobId) async {
     try {
-      final Response response =
-          await dioClient.post('/api/$timelineId', data: json.encode({}));
+      final Response response = await dioClient.post('/api/$jobId',
+          data: json.encode(steps.map((e) => e.toJson()).toList()));
 
       return response;
     } catch (err) {

@@ -113,4 +113,12 @@ class JoblineTextStyle {
       fontWeight: JoblineFontWeight.medium,
     );
   }
+
+  /// Button Text Style
+  static TextStyle get mainHeadline {
+    return _baseTextStyle.copyWith(
+      fontSize: 30,
+      fontWeight: JoblineFontWeight.black,
+    );
+  }
 }

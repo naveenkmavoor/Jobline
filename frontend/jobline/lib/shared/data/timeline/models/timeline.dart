@@ -15,8 +15,8 @@ class Timelines extends Equatable {
     );
   }
 
-  Timelines.fromJson(Map<String, dynamic> json)
-      : timelines = (json as List?)
+  Timelines.fromJson(List<dynamic>? json)
+      : timelines = (json as List<dynamic>?)
             ?.map((dynamic e) => Timeline.fromJson(e as Map<String, dynamic>))
             .toList();
 
@@ -40,12 +40,16 @@ class Timeline {
   final String? id;
   final String? jobTitle;
   final String? recruiterId;
+  final String? company;
+  final String? jobPostLink;
   final List<String>? steps;
   final int? v;
 
   Timeline({
     this.id,
     this.jobTitle,
+    this.jobPostLink,
+    this.company,
     this.recruiterId,
     this.steps,
     this.v,
@@ -54,6 +58,8 @@ class Timeline {
   Timeline copyWith({
     String? id,
     String? jobTitle,
+    String? jobPostLink,
+    String? company,
     String? recruiterId,
     List<String>? steps,
     int? v,
@@ -61,7 +67,9 @@ class Timeline {
     return Timeline(
       id: id ?? this.id,
       jobTitle: jobTitle ?? this.jobTitle,
+      company: company ?? this.company,
       recruiterId: recruiterId ?? this.recruiterId,
+      jobPostLink: jobPostLink ?? this.jobPostLink,
       steps: steps ?? this.steps,
       v: v ?? this.v,
     );
@@ -69,15 +77,19 @@ class Timeline {
 
   Timeline.fromJson(Map<String, dynamic> json)
       : id = json['_id'] as String?,
+        company = json['company'] as String?,
         jobTitle = json['jobTitle'] as String?,
         recruiterId = json['recruiterId'] as String?,
+        jobPostLink = json['jobPostLink'] as String?,
         steps =
             (json['steps'] as List?)?.map((dynamic e) => e as String).toList(),
         v = json['__v'] as int?;
 
   Map<String, dynamic> toJson() => {
         '_id': id,
+        'company': company,
         'jobTitle': jobTitle,
+        'jobPostLink': jobPostLink,
         'recruiterId': recruiterId,
         'steps': steps,
         '__v': v

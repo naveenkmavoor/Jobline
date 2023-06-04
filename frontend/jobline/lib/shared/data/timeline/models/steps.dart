@@ -27,12 +27,10 @@ class Steps {
         v = json['__v'] as int?;
 
   Map<String, dynamic> toJson() => {
-        '_id': id,
         'name': name,
         'description': description,
         'eta': eta,
         'timelineId': timelineId,
         'order': order,
-        '__v': v
       };
 }

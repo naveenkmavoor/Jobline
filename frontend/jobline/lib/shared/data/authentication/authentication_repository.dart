@@ -39,20 +39,20 @@ class AuthenticationRepository {
         password: password,
       );
       _user = User(
-          accType: response.data['checkUser']['role'] == 'recruiter'
-              ? AccType.recruiter
-              : AccType.candidate,
-          email: response.data['checkUser']['email'],
-          id: response.data['checkUser']['_id'],
-          name: response.data['checkUser']['name'],
-          token: response.data['token']);
+          // accType: response.data['user']['role'] == 'recruiter'
+          //     ? AccType.recruiter
+          //     : AccType.candidate,
+          email: response.data['user']['email'],
+          id: response.data['user']['_id'] ?? "1",
+          name: response.data['user']['name'],
+          token: response.data['user']['token']);
 
       Hive.box('appBox').putAll({
-        'accType': response.data['checkUser']['role'],
-        'email': response.data['checkUser']['email'],
-        'id': response.data['checkUser']['_id'],
-        'name': response.data['checkUser']['name'],
-        'token': response.data['token']
+        // 'accType': response.data['checkUser']['role'],
+        'email': response.data['user']['email'],
+        'id': response.data['user']['_id'] ?? "1",
+        'name': response.data['user']['name'],
+        'token': response.data['user']['token']
       });
     } on DioError catch (e) {
       throw DioExceptions.fromDioError(e, isAuthentication: true);
