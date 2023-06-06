@@ -13,7 +13,7 @@ import 'package:jobline/widgets/custom_snackbar.dart';
 import 'package:jobline/widgets/custom_textfield.dart';
 
 class LoginForm extends StatefulWidget {
-  LoginForm({Key? key}) : super(key: key);
+  const LoginForm({Key? key}) : super(key: key);
 
   @override
   State<LoginForm> createState() => _LoginFormState();
@@ -114,11 +114,11 @@ class _LoginFormState extends State<LoginForm> {
                     text: TextSpan(children: [
                   TextSpan(
                     text: state.email.value,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.black,
                     ),
                   ),
-                  TextSpan(
+                  const TextSpan(
                     text: " isn't registered with us",
                     style: TextStyle(
                       color: Colors.black,

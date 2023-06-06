@@ -40,11 +40,12 @@ class TimelineRepository {
     }
   }
 
-  Future<Response> updateTimelineRepo(List<Steps> steps, String jobId) async {
+  Future<CurrentTimeline> updateTimelineRepo(
+      List<Steps> steps, String jobId) async {
     try {
       final Response response = await _timelineApi.updateTimeline(steps, jobId);
 
-      return response;
+      return CurrentTimeline.fromJson(response.data);
     } on DioError catch (e) {
       throw DioExceptions.fromDioError(e);
     }

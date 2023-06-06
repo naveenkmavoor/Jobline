@@ -7,7 +7,7 @@ enum InputType { text, phone, email, password, number, url, address, multiline }
 enum Variant { filled, outlined }
 
 class FormConstant {
-  static double height = 51;
+  static double height = 10;
   static double padding = 18;
   static const Color errorField = JoblineColors.error;
   static const Color focusField = JoblineColors.lightThemeTertiary;
@@ -78,7 +78,7 @@ class CustomTextField extends StatelessWidget {
     this.hintStyle,
     this.helperText,
     this.errorText,
-    required this.type,
+    this.type = InputType.text,
     this.tap,
     this.disabled = false,
     this.readOnly = false,

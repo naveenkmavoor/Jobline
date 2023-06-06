@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jobline/colors.dart';
 
-Future<void> customAlertDialog<T>({
+Future<void> customAlertDialog({
   required BuildContext context,
   required List<Widget> actions,
   required Widget body,

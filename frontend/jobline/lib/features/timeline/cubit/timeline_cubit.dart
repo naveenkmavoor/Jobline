@@ -28,7 +28,7 @@ class TimelineCubit extends Cubit<TimelineState> {
 
       emit(state.copyWith(
         timelines: timelines,
-        isTimelineCreationSuccess: false,
+        isTimelineSuccess: false,
         currentTimeline: currentTimeline,
       ));
     } catch (err) {
@@ -97,8 +97,9 @@ class TimelineCubit extends Cubit<TimelineState> {
       }
 
       emit(state.copyWith(
-          isTimelineCreationSuccess: true,
-          isButtonLoading: false,
+          isTimelineSuccess: true,
+          timelineMode: TimelineMode.edit,
+          successMssg: "Successfully created Timeline.",
           currentTimeline: CurrentTimeline(
               timeline: response, numberOfSteps: job.totalPhases, steps: steps),
           timelines: Timelines(timelines: newTimelines)));
@@ -112,7 +113,11 @@ class TimelineCubit extends Cubit<TimelineState> {
     try {
       final timelines =
           await timelineRepository.updateTimelineRepo(steps, jobId);
-      getAllTimeline();
+
+      emit(state.copyWith(
+          // currentTimeline: timelines,
+          timelineMode: TimelineMode.create));
+      // getAllTimeline();
     } catch (err) {
       emit(state.copyWith(error: err.toString()));
     }
