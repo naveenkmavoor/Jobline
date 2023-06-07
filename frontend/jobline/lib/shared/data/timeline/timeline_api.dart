@@ -61,4 +61,14 @@ class TimelineApi {
       rethrow;
     }
   }
+
+  Future<Response> deletePhaseApi(String stepId) async {
+    try {
+      final Response response = await dioClient.delete('/api/$stepId');
+
+      return response;
+    } catch (err) {
+      rethrow;
+    }
+  }
 }

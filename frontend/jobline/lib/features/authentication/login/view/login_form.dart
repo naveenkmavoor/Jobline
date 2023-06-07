@@ -133,7 +133,7 @@ class _LoginFormState extends State<LoginForm> {
           }
         }
         if (state.status.isSubmissionSuccess) {
-          context.goNamed("timeline");
+          context.goNamed('timeline', pathParameters: {'timelineId': " "});
           customSnackBar(
               context: context,
               snackBarType: SnackBarType.info,

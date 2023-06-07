@@ -50,4 +50,12 @@ class TimelineRepository {
       throw DioExceptions.fromDioError(e);
     }
   }
+
+  Future<void> deletePhaseRepo(String stepId) async {
+    try {
+      await _timelineApi.deletePhaseApi(stepId);
+    } on DioError catch (e) {
+      throw DioExceptions.fromDioError(e);
+    }
+  }
 }

@@ -42,7 +42,7 @@ class Timeline {
   final String? recruiterId;
   final String? company;
   final String? jobPostLink;
-  final List<String>? steps;
+  // final List<String>? steps;
   final int? v;
 
   Timeline({
@@ -51,7 +51,7 @@ class Timeline {
     this.jobPostLink,
     this.company,
     this.recruiterId,
-    this.steps,
+    // this.steps,
     this.v,
   });
 
@@ -61,7 +61,7 @@ class Timeline {
     String? jobPostLink,
     String? company,
     String? recruiterId,
-    List<String>? steps,
+    // List<String>? steps,
     int? v,
   }) {
     return Timeline(
@@ -70,7 +70,7 @@ class Timeline {
       company: company ?? this.company,
       recruiterId: recruiterId ?? this.recruiterId,
       jobPostLink: jobPostLink ?? this.jobPostLink,
-      steps: steps ?? this.steps,
+      // steps: steps ?? this.steps,
       v: v ?? this.v,
     );
   }
@@ -80,18 +80,18 @@ class Timeline {
         company = json['company'] as String?,
         jobTitle = json['jobTitle'] as String?,
         recruiterId = json['recruiterId'] as String?,
-        jobPostLink = json['jobPostLink'] as String?,
-        steps =
-            (json['steps'] as List?)?.map((dynamic e) => e as String).toList(),
+        jobPostLink = json['jobLink'] as String?,
+        // steps =
+        //     (json['steps'] as List?)?.map((dynamic e) => e as String).toList(),
         v = json['__v'] as int?;
 
   Map<String, dynamic> toJson() => {
         '_id': id,
         'company': company,
         'jobTitle': jobTitle,
-        'jobPostLink': jobPostLink,
+        'jobLink': jobPostLink,
         'recruiterId': recruiterId,
-        'steps': steps,
+        // 'steps': steps,
         '__v': v
       };
 }

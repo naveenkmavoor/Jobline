@@ -9,7 +9,7 @@ class DioClient {
   DioClient._internal() {
     // const String baseUrl =
     //     "https://jobline-server.jgxys75xs-bhavisshyya.vercel.app";
-    const String baseUrl = "https://jobline-9fv2ivz9c-bhavisshyya.vercel.app";
+    const String baseUrl = "https://jobline-drvlhh5ca-bhavisshyya.vercel.app/";
 
     _dio
           ..options.baseUrl = baseUrl

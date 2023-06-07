@@ -1,8 +1,8 @@
 class Steps {
   final String? id;
-  final String? name;
-  final String? description;
-  final int? eta;
+  String? name;
+  String? description;
+  int? eta;
   final String? timelineId;
   final int? order;
   final int? v;

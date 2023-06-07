@@ -181,7 +181,8 @@ class _SignUpFormState extends State<SignUpForm> {
               context: context,
               snackBarType: SnackBarType.info,
               title: "Account creation successful.");
-          return context.goNamed('timeline');
+          return context
+              .goNamed('timeline', pathParameters: {'timelineId': " "});
         }
       },
       child: SingleChildScrollView(

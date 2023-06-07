@@ -5,7 +5,7 @@ import 'package:jobline/colors.dart';
 import 'package:jobline/widgets/custom_button.dart';
 import 'package:jobline/widgets/jobline_title.dart';
 
-enum AppBarTypes { login, signup, common }
+enum AppBarTypes { login, signup, common, general }
 
 AppBar buildAppBarType(
     {required BuildContext context, required AppBarTypes type}) {
@@ -63,6 +63,36 @@ AppBar buildAppBarType(
               radius: 30,
               child: const Text(
                 'Sign in',
+                style: TextStyle(color: JoblineColors.white),
+              ),
+            ),
+          )
+        ],
+      );
+
+    case AppBarTypes.general:
+      return AppBar(
+        automaticallyImplyLeading: false,
+        title: const JoblineTitle(),
+        actions: [
+          TextButton(
+            onPressed: () {
+              return context.goNamed('signup');
+            },
+            child: const Text(
+              'SIGN UP',
+              style: TextStyle(color: JoblineColors.accentColor),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(9.0),
+            child: CustomButton(
+              onPressFunction: () {
+                return context.goNamed('login');
+              },
+              radius: 30,
+              child: const Text(
+                'SIGN IN',
                 style: TextStyle(color: JoblineColors.white),
               ),
             ),

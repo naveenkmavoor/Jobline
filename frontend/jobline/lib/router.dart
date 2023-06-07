@@ -10,7 +10,7 @@ class ScreenPaths {
   static const String home = '/';
   static const String login = 'login';
   static const String signup = '/signup';
-  static const String timeLine = '/timeline';
+  static const String timeLine = '/timeline/:timelineId';
   static const String settings = 'settings';
   // static String wonderDetails(WonderType type, {int tabIndex = 0}) => '/wonder/${type.name}?t=$tabIndex';
   // static String video(String id) => '/video/$id';
@@ -52,8 +52,10 @@ final GoRouter router = GoRouter(
     GoRoute(
       name: 'timeline',
       path: ScreenPaths.timeLine,
-      builder: (context, state) => const TimelineCreate(),
-    )
+      builder: (context, state) => TimelineCreate(
+        timelineId: state.pathParameters['timelineId'],
+      ),
+    ),
   ],
   errorBuilder: (context, state) => const ErrorScreen(),
 );

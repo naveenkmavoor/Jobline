@@ -20,6 +20,6 @@ class Job {
   Map<String, dynamic> toJson() => {
         'jobTitle': title,
         'company': companyName,
-        'jobPostLinks': jobLinktoPost,
+        'jobLink': jobLinktoPost,
       };
 }

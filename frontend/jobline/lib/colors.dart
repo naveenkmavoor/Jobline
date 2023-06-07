@@ -51,4 +51,6 @@ abstract class JoblineColors {
   static const Color charcoal = Color(0xBF202124);
 
   static const Color lightOrange = Color(0xFFFCA311);
+
+  static const Color lightGrey = Color(0xFF525252);
 }

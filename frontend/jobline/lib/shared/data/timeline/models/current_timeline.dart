@@ -32,6 +32,20 @@ class CurrentTimeline {
         'status': status?.map((e) => e.toJson()).toList(),
         'numberOfSteps': numberOfSteps
       };
+
+  CurrentTimeline copyWith({
+    Timeline? timeline,
+    List<Steps>? steps,
+    List<Status>? status,
+    int? numberOfSteps,
+  }) {
+    return CurrentTimeline(
+      timeline: timeline ?? this.timeline,
+      steps: steps ?? this.steps,
+      status: status ?? this.status,
+      numberOfSteps: numberOfSteps ?? this.numberOfSteps,
+    );
+  }
 }
 
 class Status {

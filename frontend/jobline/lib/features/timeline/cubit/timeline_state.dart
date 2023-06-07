@@ -9,6 +9,7 @@ class TimelineState extends Equatable {
   final bool isButtonLoading;
   final bool isPageLoading;
   final bool isTimelineSuccess;
+
   final TimelineMode timelineMode;
   final String? error;
   final String? successMssg;

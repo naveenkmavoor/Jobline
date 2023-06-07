@@ -1,7 +1,4 @@
-import 'dart:ui';
-
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jobline/shared/data/timeline/models/current_timeline.dart';
 import 'package:jobline/shared/data/timeline/models/job.dart';
@@ -20,14 +17,18 @@ class TimelineCubit extends Cubit<TimelineState> {
     try {
       emit(state.copyWith(isPageLoading: true));
       final timelines = await timelineRepository.getAllTimelineRepo();
+      Timelines? reverseTimelines;
       CurrentTimeline? currentTimeline;
       if (timelines.timelines != null && timelines.timelines!.isNotEmpty) {
-        final jobId = timelines.timelines?[0].id;
+        //reversing the job timeline to show the most recently added to the first
+        reverseTimelines =
+            Timelines(timelines: timelines.timelines!.reversed.toList());
+        final jobId = reverseTimelines.timelines?[0].id;
         currentTimeline = await timelineRepository.getTimelineRepo(jobId!);
       }
 
       emit(state.copyWith(
-        timelines: timelines,
+        timelines: reverseTimelines,
         isTimelineSuccess: false,
         currentTimeline: currentTimeline,
       ));
@@ -60,8 +61,8 @@ class TimelineCubit extends Cubit<TimelineState> {
     try {
       final currentTimeline = await timelineRepository.getTimelineRepo(id);
       emit(state.copyWith(
-        currentTimeline: currentTimeline,
-      ));
+          currentTimeline: currentTimeline,
+          timelineMode: TimelineMode.general));
     } catch (err) {
       emit(state.copyWith(
         error: err.toString(),
@@ -78,7 +79,8 @@ class TimelineCubit extends Cubit<TimelineState> {
       if (state.timelines != null) {
         newTimelines = List.from(state.timelines!.timelines!);
       }
-      newTimelines.insert(0, response);
+      //currently job post link is not getting from the server so adding from the state
+      newTimelines.insert(0, response.copyWith(jobPostLink: job.jobLinktoPost));
       //set isTimelineCreationSuccess to false only after saving the timeline
       //otherwise set to true for checking if there is a pending timeline to save
 
@@ -101,10 +103,59 @@ class TimelineCubit extends Cubit<TimelineState> {
           timelineMode: TimelineMode.edit,
           successMssg: "Successfully created Timeline.",
           currentTimeline: CurrentTimeline(
-              timeline: response, numberOfSteps: job.totalPhases, steps: steps),
+            timeline: response.copyWith(jobPostLink: job.jobLinktoPost),
+            numberOfSteps: job.totalPhases,
+            steps: steps,
+          ),
           timelines: Timelines(timelines: newTimelines)));
     } catch (err) {
       emit(state.copyWith(error: err.toString(), isButtonLoading: false));
+    }
+  }
+
+  void timelineModeChange(TimelineMode timelineMode) {
+    emit(state.copyWith(timelineMode: timelineMode));
+  }
+
+  void updatePhaseTitle({String? title, required int order}) {
+    state.currentTimeline?.steps?.forEach((element) {
+      if (order == element.order) {
+        element.name = title ?? 'Phase ${order + 1}';
+      }
+    });
+  }
+
+  void updatePhaseDescription({String? description, required int order}) {
+    state.currentTimeline?.steps?.forEach((element) {
+      if (order == element.order) {
+        element.description = description ?? 'Description ${order + 1}';
+      }
+    });
+  }
+
+  void updatePhaseEta({int? eta, required int order}) {
+    state.currentTimeline?.steps?.forEach((element) {
+      if (order == element.order) {
+        element.eta = eta ?? order + 1;
+      }
+    });
+  }
+
+  Future<void> deletePhase(String stepId, int order) async {
+    final newlist = List<Steps>.from(state.currentTimeline!.steps!);
+
+    try {
+      if (stepId.isNotEmpty) {
+        final timelines = await timelineRepository.deletePhaseRepo(stepId);
+      }
+
+      newlist.removeWhere((element) => element.order == order);
+      emit(state.copyWith(
+        currentTimeline: state.currentTimeline?.copyWith(steps: newlist),
+        successMssg: "Successfully deleted the phase!",
+      ));
+    } catch (err) {
+      emit(state.copyWith(error: err.toString()));
     }
   }
 
@@ -115,7 +166,9 @@ class TimelineCubit extends Cubit<TimelineState> {
           await timelineRepository.updateTimelineRepo(steps, jobId);
 
       emit(state.copyWith(
-          // currentTimeline: timelines,
+          currentTimeline:
+              state.currentTimeline?.copyWith(steps: timelines.steps),
+          successMssg: "Successfully created the timeline!",
           timelineMode: TimelineMode.create));
       // getAllTimeline();
     } catch (err) {
