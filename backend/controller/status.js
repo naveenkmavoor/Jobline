@@ -2,6 +2,8 @@ const Status = require("../models/Status");
 const Timeline = require("../models/Timeline");
 const Step = require("../models/Step");
 const User = require("../models/User");
+const { MailGenerator, transporter } = require("../utils/nodemailer");
+
 const addUserStatus = async (req, res, next) => {
   try {
     const timelineId = req.params.timelineId;
@@ -15,7 +17,6 @@ const addUserStatus = async (req, res, next) => {
     }
 
     const emails = req.body.emails;
-
     const statusPromises = emails.map(async (email) => {
       const existingStatus = await Status.findOne({ email });
 
@@ -23,17 +24,44 @@ const addUserStatus = async (req, res, next) => {
         existingStatus.timelineId = timelineId;
         existingStatus.stepId = stepId;
         await existingStatus.save();
-
         return existingStatus;
       } else {
         const newStatus = new Status({ email, timelineId, stepId });
         await newStatus.save();
-
         return newStatus;
       }
     });
 
     const userStatuses = await Promise.all(statusPromises);
+    const response = {
+      body: {
+        name: "Jobline Here",
+        intro: `Congratulations! You have been invited to join the recruitment timeline for the position of ${timeline.jobTitle} at ${timeline.company}. You can view your progress and any updates on your application through Jobline. We wish you all the best on this journey!`,
+      },
+    };
+    const mail = MailGenerator.generate(response);
+
+    const messages = emails.map((email) => {
+      return {
+        from: process.env.EMAIL,
+        to: email,
+        subject: ` Your Journey with ${timeline.company} for the  ${timeline.jobTitle} Begins!`,
+        html: mail,
+      };
+    });
+
+    const emailPromises = messages.map((message) => {
+      return transporter.sendMail(message);
+    });
+
+    Promise.all(emailPromises)
+      .then(() => {
+        console.log("emails sent");
+      })
+      .catch((err) => {
+        console.error("Error sending emails:", err);
+        return res.status(500).json({ err });
+      });
 
     res.send(userStatuses);
   } catch (error) {
@@ -46,7 +74,7 @@ const getUserStatus = async (req, res, next) => {
     const userId = req.user.id;
     const timelineId = req.params.id;
 
-    // Check if the user is associated 
+    // Check if the user is associated
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).send("User not associated ");

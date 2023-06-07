@@ -14,28 +14,65 @@ const createTimeLine = async (req, res, next) => {
   }
 };
 
+// const addSteps = async (req, res, next) => {
+//   try {
+//     const timelineId = req.params.id;
+
+//     // data in form [ {} , {} , {} ]
+
+//     const data = req.body;
+//     const timeline = await TimeLine.findById(timelineId);
+//     if (!timeline) {
+//       return res.status(404).json({ message: "Timeline not found" });
+//     }
+//     const steps = await Step.find({ timelineId });
+
+//     if (!timeline.steps) {
+//       timeline.steps = [];
+//     }
+//     const currentStepsCount = steps.length;
+//     const addedSteps = [];
+//     console.log(currentStepsCount);
+
+//     for (let i = 0; i < data.length; i++) {
+//       const stepData = data[i];
+//       const stepOrder = currentStepsCount + i; // Calculate the order value
+
+//       const step = new Step({
+//         ...stepData,
+//         timelineId,
+//         order: stepOrder,
+//       });
+
+//       await step.save();
+//       timeline.steps.push(step);
+//       addedSteps.push(step);
+//     }
+//     await timeline.save();
+//     res.status(201).json({ timeline, addedSteps });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
 const addSteps = async (req, res, next) => {
   try {
     const timelineId = req.params.id;
-
-    // data in form [ {} , {} , {} ]
-
     const data = req.body;
+
     const timeline = await TimeLine.findById(timelineId);
     if (!timeline) {
       return res.status(404).json({ message: "Timeline not found" });
     }
-    const steps = await Step.find({ timelineId });
-    if (!timeline.steps) {
-      timeline.steps = [];
-    }
-    const currentStepsCount = steps.length;
+
+    // Delete existing steps
+    await Step.deleteMany({ timelineId });
+
     const addedSteps = [];
-    console.log(currentStepsCount);
 
     for (let i = 0; i < data.length; i++) {
       const stepData = data[i];
-      const stepOrder = currentStepsCount + i; // Calculate the order value
+      const stepOrder = i;
 
       const step = new Step({
         ...stepData,
@@ -44,11 +81,13 @@ const addSteps = async (req, res, next) => {
       });
 
       await step.save();
-      timeline.steps.push(step);
       addedSteps.push(step);
     }
+
+    timeline.steps = addedSteps;
     await timeline.save();
-    res.status(201).json({ timeline, addedSteps });
+
+    res.status(201).json({ timeline, steps: addedSteps });
   } catch (error) {
     next(error);
   }
@@ -97,30 +136,6 @@ const deleteStep = async (req, res, next) => {
     if (!deletedStep) {
       return res.status(404).send("Step not found");
     }
-
-    // const timelineId = deletedStep.timelineId;
-    // const timeline = await Timeline.findById(timelineId)
-    // console.log(timeline)
-    // if (!timeline) {
-    //   return res.status(404).send("Timeline not found");
-    // }
-
-    // // Remove the deleted step from the timeline's steps array
-    // const remainingSteps = timeline.steps.filter(
-    //   (step) => step._id.toString() !== stepId
-    // );
-
-    // // Reorder the remaining steps based on their index
-    // const orderedSteps = remainingSteps.map((step, index) => {
-    //   step.order = index;
-    //   return step;
-    // });
-
-    // // Update the timeline's steps array with the reordered steps
-    // timeline.steps = orderedSteps;
-
-    // // Save the updated timeline
-    // await timeline.save();
     const timelineId = deletedStep.timelineId;
 
     const steps = await Step.find({ timelineId }).sort({ order: 1 });

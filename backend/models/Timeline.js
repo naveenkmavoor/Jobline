@@ -1,15 +1,15 @@
 const mongoose = require("mongoose");
 
 const TimelineSchema = new mongoose.Schema({
-  jobTitle:{
-    type:String,
-    required:true
+  jobTitle: {
+    type: String,
+    required: true,
   },
-  company:{
-    type:String,
+  company: {
+    type: String,
   },
-  jobPostLink:{
-    type:String,
+  jobPostLink: {
+    type: String,
   },
   recruiterId: {
     type: mongoose.Schema.Types.ObjectId,

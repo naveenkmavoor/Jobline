@@ -36,6 +36,7 @@ const verifySameRecruiter = (req, res, next) => {
     if (!timeline) {
       return res.status(403).send("Timeline id is incorrect");
     }
+    // console.log(req.user)
     if (
       timeline.recruiterId.toString() === req.user.id &&
       req.user.role === "recruiter"
