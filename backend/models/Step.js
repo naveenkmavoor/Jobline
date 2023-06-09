@@ -23,6 +23,12 @@ const stepSchema = new mongoose.Schema({
   order: {
     type: Number,
   },
+  status: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Status",
+    },
+  ],
 });
 
 const Step = mongoose.model("Step", stepSchema);

@@ -106,10 +106,19 @@ const getTimeLine = async (req, res, next) => {
     const status = await Status.find({ timelineId });
 
     steps.sort((a, b) => a.order - b.order); // sorting the steps
+
+    // Iterate through each step
+    for (const step of steps) {
+      const stepStatus = status.filter(
+        (s) => s.stepId.toString() === step._id.toString()
+      );
+      step.status = stepStatus; // Assign the statuses to the step
+    }
+    
     const numberOfSteps = steps.length;
     const jobLink = timeline.jobPostLink;
 
-    res.status(201).send({ timeline, steps, status, numberOfSteps, jobLink });
+    res.status(201).send({ timeline, steps, numberOfSteps, jobLink });
   } catch (error) {
     next(error);
   }

@@ -150,4 +150,103 @@ const moveUserToNextStep = async (req, res, next) => {
   }
 };
 
-module.exports = { addUserStatus, getUserStatus, moveUserToNextStep };
+const getStatuses = async (req, res, next) => {
+  try {
+    const timelineId = req.params.id;
+
+    let steps = await Step.find({ timelineId });
+    const status = await Status.find({ timelineId });
+
+    steps.sort((a, b) => a.order - b.order); // sorting the steps
+
+    // Iterate through each step
+    for (const step of steps) {
+      const stepStatus = status.filter(
+        (s) => s.stepId.toString() === step._id.toString()
+      );
+      step.status = stepStatus; // Assign the statuses to the step
+    }
+
+    res.status(201).send({ steps });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const feedbackToUser = async (req, res, next) => {
+  try {
+    const feedbackDetails = req.body;
+    const timelineId = req.params.id;
+
+    const timeline = await Timeline.findById(timelineId);
+    const messages = feedbackDetails.map((feedbackDetail) => {
+      if (feedbackDetail.message === null || feedbackDetail.message === "") {
+        const response = {
+          body: {
+            name: "Jobline Here",
+            intro: [
+              `We regret to inform you that you have not been selected to proceed to the next phase of the recruitment process for ${timeline.jobTitle} at ${timeline.company}.`,
+              `We appreciate your interest in ${timeline.company} and encourage you to apply for future positions. Every experience brings you one step closer to your dream role!`,
+            ],
+            signature: "Best regards",
+          },
+        };
+        const mail = MailGenerator.generate(response);
+        const email = feedbackDetail.email;
+        return {
+          from: process.env.EMAIL,
+          to: email,
+          subject: ` Update on Your Application for ${timeline.jobTitle}  at ${timeline.company}`,
+          html: mail,
+        };
+      } else {
+        const msg = feedbackDetail.message;
+        const response = {
+          body: {
+            name: "Jobline Here",
+            intro: [
+              `We regret to inform you that you have not been selected to proceed to the next phase of the recruitment process for ${timeline.jobTitle} at ${timeline.company}.`,
+              `However, the recruiter has provided some feedback which may help in your future applications, please find it down below.
+            `,
+              `${msg}`,
+            ],
+            signature: "Best regards",
+          },
+        };
+        const mail = MailGenerator.generate(response);
+        const email = feedbackDetail.email;
+        return {
+          from: process.env.EMAIL,
+          to: email,
+          subject: ` Update on Your Application for ${timeline.jobTitle}  at ${timeline.company}`,
+          html: mail,
+        };
+      }
+    });
+
+    const emailPromises = messages.map((message) => {
+      return transporter.sendMail(message);
+    });
+
+    Promise.all(emailPromises)
+      .then(() => {
+        console.log("emails sent");
+      })
+      .catch((err) => {
+        console.error("Error sending emails:", err);
+        return res.status(500).json({ err });
+      });
+
+    res.send("feedback send successfully");
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  addUserStatus,
+  getUserStatus,
+  moveUserToNextStep,
+  getStatuses,
+  feedbackToUser,
+};
