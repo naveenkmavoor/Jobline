@@ -1,9 +1,10 @@
 const {
   addUserStatus,
   getUserStatus,
-  moveUserToNextStep,
   getStatuses,
   feedbackToUser,
+  moveUser,
+  withdrawStatus,
 } = require("../controller/status");
 const {
   verifySameRecruiter,
@@ -19,7 +20,8 @@ router.post(
   addUserStatus
 );
 router.get("/getUser/:id", userAuth, getUserStatus);
-router.post("/moveUser/:id", verifySameRecruiter, moveUserToNextStep);
+router.post("/moveUser/:id", verifySameRecruiter, moveUser);
 router.get("/getStatuses/:id", getStatuses);
 router.post("/feedback/:id", feedbackToUser);
+router.get("/withdraw/:id", userAuth, withdrawStatus);
 module.exports = router;

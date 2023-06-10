@@ -92,6 +92,8 @@ const getUserStatus = async (req, res, next) => {
     const step = await Step.findById(stepId);
     const stepNumber = step.order;
     status.stepIdx = stepNumber;
+    status.name = user.name;
+    // console.log(status.name);
     await status.save();
     res.status(200).json({ status, stepNumber });
   } catch (error) {
@@ -99,52 +101,117 @@ const getUserStatus = async (req, res, next) => {
   }
 };
 
-const moveUserToNextStep = async (req, res, next) => {
+// const moveUserToNextStep = async (req, res, next) => {
+//   try {
+//     const timelineId = req.params.id;
+//     const emails = req.body.emails; // Assuming 'emails' is an array of email addresses
+
+//     const timeline = await Timeline.findById(timelineId);
+//     if (!timeline) {
+//       return res.status(404).send("Timeline not found");
+//     }
+
+//     // Find the status documents for the specified timeline and emails
+//     const statuses = await Status.find({ timelineId, email: { $in: emails } });
+
+//     if (statuses.length === 0) {
+//       return res.status(404).send("Statuses not found");
+//     }
+
+//     const currentStepId = statuses[0].stepId; // Assuming all statuses have the same stepId
+
+//     // Find the timeline document
+//     const allSteps = await Step.find({ timelineId });
+
+//     const sortedSteps = allSteps.sort((a, b) => a.order - b.order);
+
+//     const currentStepIndex = sortedSteps.findIndex(
+//       (step) => step._id.toString() === currentStepId.toString()
+//     );
+
+//     if (currentStepIndex === sortedSteps.length - 1) {
+//       return res.send(
+//         `The users have reached the last step of the timeline and step id`
+//       );
+//     }
+
+//     const nextStep = sortedSteps[currentStepIndex + 1];
+
+//     for (const status of statuses) {
+//       status.stepId = nextStep._id;
+//       await status.save();
+//     }
+
+//     res.send(`Users moved to the next step and step id = ${nextStep._id}`);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+const moveUser = async (req, res, next) => {
   try {
     const timelineId = req.params.id;
-    const emails = req.body.emails; // Assuming 'emails' is an array of email addresses
+    const userSteps = req.body; // Assuming 'userSteps' is an array of objects containing step ID and email
 
     const timeline = await Timeline.findById(timelineId);
     if (!timeline) {
       return res.status(404).send("Timeline not found");
     }
+    // console.log(userSteps);
 
-    // Find the status documents for the specified timeline and emails
-    const statuses = await Status.find({ timelineId, email: { $in: emails } });
+    for (const userStep of userSteps) {
+      const { email, stepId } = userStep;
 
-    if (statuses.length === 0) {
-      return res.status(404).send("Statuses not found");
-    }
+      const status = await Status.findOne({ timelineId, email });
 
-    const currentStepId = statuses[0].stepId; // Assuming all statuses have the same stepId
+      if (!status) {
+        return res.status(404).send(`Status not found for email ${email} `);
+      }
 
-    // Find the timeline document
-    const allSteps = await Step.find({ timelineId });
+      if (status.status === "rejected" || status.status === "Rejected") {
+        return res
+          .status(403)
+          .send(`User status is not pending for email ${email}`);
+      }
 
-    // Sort the steps based on their order
-    const sortedSteps = allSteps.sort((a, b) => a.order - b.order);
-
-    // Find the index of the current step in the timeline
-    const currentStepIndex = sortedSteps.findIndex(
-      (step) => step._id.toString() === currentStepId.toString()
-    );
-
-    // Check if the current step is the last step in the timeline
-    if (currentStepIndex === sortedSteps.length - 1) {
-      return res.send(
-        `The users have reached the last step of the timeline and step id`
-      );
-    }
-    // Get the next step in the timeline
-    const nextStep = sortedSteps[currentStepIndex + 1];
-
-    // Update the status documents with the new stepId
-    for (const status of statuses) {
-      status.stepId = nextStep._id;
+      status.stepId = stepId;
       await status.save();
     }
 
-    res.send(`Users moved to the next step and step id = ${nextStep._id}`);
+    // let's notify the users
+
+    const response = {
+      body: {
+        name: "Jobline Here",
+        intro: `Great news! You have moved to the next phase of the recruitment process for ${timeline.jobTitle} at ${timeline.company}. Please log into Jobline to view the details and next steps. Keep up the great work!`,
+      },
+    };
+    const mail = MailGenerator.generate(response);
+
+    const messages = userSteps.map((userStep) => {
+      const email = userStep.email;
+      return {
+        from: process.env.EMAIL,
+        to: email,
+        subject: `Progress Update for ${timeline.jobTitle}  at ${timeline.company}`,
+        html: mail,
+      };
+    });
+
+    const emailPromises = messages.map((message) => {
+      return transporter.sendMail(message);
+    });
+
+    Promise.all(emailPromises)
+      .then(() => {
+        console.log("emails sent");
+      })
+      .catch((err) => {
+        console.error("Error sending emails:", err);
+        return res.status(500).json({ err });
+      });
+
+    res.send("Users moved successfully");
   } catch (error) {
     next(error);
   }
@@ -159,12 +226,11 @@ const getStatuses = async (req, res, next) => {
 
     steps.sort((a, b) => a.order - b.order); // sorting the steps
 
-    // Iterate through each step
     for (const step of steps) {
       const stepStatus = status.filter(
         (s) => s.stepId.toString() === step._id.toString()
       );
-      step.status = stepStatus; // Assign the statuses to the step
+      step.status = stepStatus;
     }
 
     res.status(201).send({ steps });
@@ -237,7 +303,25 @@ const feedbackToUser = async (req, res, next) => {
         return res.status(500).json({ err });
       });
 
-    res.send("feedback send successfully");
+    res.status(200).send("feedback send successfully");
+  } catch (error) {
+    next(error);
+  }
+};
+
+const withdrawStatus = async (req, res, next) => {
+  try {
+    const timelineId = req.params.id;
+    const userId = req.user.id;
+
+    const user = await User.findById(userId);
+    const email = user.email;
+
+    const status = await Status.findOne({ timelineId, email });
+
+    status.status = "rejected";
+    await status.save();
+    return res.status(200).send("Sucessfully withdraw");
   } catch (error) {
     next(error);
   }
@@ -246,7 +330,9 @@ const feedbackToUser = async (req, res, next) => {
 module.exports = {
   addUserStatus,
   getUserStatus,
-  moveUserToNextStep,
+  // moveUserToNextStep,
   getStatuses,
   feedbackToUser,
+  moveUser,
+  withdrawStatus,
 };

@@ -25,10 +25,13 @@ const statusSchema = new mongoose.Schema({
     type: String,
     default: "Pending",
   },
-  email:{
-    type:String,
-    unique:false
-  }
+  email: {
+    type: String,
+    unique: false,
+  },
+  name: {
+    type: String,
+  },
 });
 
 const Status = mongoose.model("Status", statusSchema);
