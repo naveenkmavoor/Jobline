@@ -24,7 +24,7 @@ Future<void> customAlertDialog({
           return outsideDismissible;
         },
         child: SimpleDialog(
-          contentPadding: const EdgeInsets.all(40),
+          contentPadding: const EdgeInsets.all(25),
           elevation: 1,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),

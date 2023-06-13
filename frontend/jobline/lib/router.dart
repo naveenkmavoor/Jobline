@@ -33,6 +33,23 @@ final GoRouter router = GoRouter(
         // if (isAuthenticate) {
         //   return "/${ScreenPaths.timeLine}";
         // }
+
+//refer sample code for redirect
+        //     redirect: (context, state) {
+        //   final userAutheticated = sessionCubit.state is Authenticated;
+        //   if (userAutheticated) {
+        //     if (state.subloc == '/login') return '/home';
+        //     if (state.subloc == '/profile') return '/profile';
+        //     if (state.subloc.contains('/order')) return '/order_history';
+        //     return null;
+        //   } else {
+        //     if (state.subloc == '/profile' || state.subloc == '/order_history') {
+        //       return '/login';
+        //     } else {
+        //       return null;
+        //     }
+        //   }
+        // }
         return "/${ScreenPaths.login}";
       },
       builder: (context, state) => const SplashScreen(),

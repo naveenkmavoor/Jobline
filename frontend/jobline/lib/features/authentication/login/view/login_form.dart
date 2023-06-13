@@ -258,7 +258,6 @@ class _LoginFormState extends State<LoginForm> {
                       children: [
                         Expanded(
                           child: CustomButton(
-                            radius: 10,
                             state: state.status.isSubmissionInProgress
                                 ? ButtonState.loading
                                 : ButtonState.enabled,

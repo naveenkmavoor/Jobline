@@ -105,12 +105,12 @@ class JoblineTheme {
     return ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         elevation: 0,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
         backgroundColor: JoblineColors.accentColor,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(30)),
         ),
-        textStyle: const TextStyle(color: JoblineColors.white),
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        textStyle: const TextStyle(color: JoblineColors.red),
         minimumSize: const Size(150, 54),
       ),
     );

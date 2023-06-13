@@ -190,7 +190,6 @@ class _NavRailExampleState extends State<TimelineCreate> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       CustomButton(
-                                        radius: 30,
                                         onPressFunction: () {
                                           buildAlertDialogBox(
                                               context, timelineCubit);

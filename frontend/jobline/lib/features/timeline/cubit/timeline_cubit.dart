@@ -141,7 +141,23 @@ class TimelineCubit extends Cubit<TimelineState> {
     });
   }
 
+  void addStep() {
+    final newlist = List<Steps>.from(state.currentTimeline!.steps!);
+    newlist.add(Steps(
+        name: "Phase ${newlist.length + 1}",
+        description: "Description ${newlist.length + 1}",
+        eta: newlist.length + 1,
+        id: "",
+        order: newlist.length,
+        timelineId: "",
+        v: newlist.length));
+    emit(state.copyWith(
+        focusLastTextField: true,
+        currentTimeline: state.currentTimeline?.copyWith(steps: newlist)));
+  }
+
   Future<void> deletePhase(String stepId, int order) async {
+    emit(state.copyWith(isDeleteButtonLoading: true));
     final newlist = List<Steps>.from(state.currentTimeline!.steps!);
 
     try {
@@ -150,9 +166,14 @@ class TimelineCubit extends Cubit<TimelineState> {
       }
 
       newlist.removeWhere((element) => element.order == order);
+
+      for (int index = 0; index < newlist.length; index++) {
+        newlist[index].order = index;
+      }
+
       emit(state.copyWith(
         currentTimeline: state.currentTimeline?.copyWith(steps: newlist),
-        successMssg: "Successfully deleted the phase!",
+        successMssg: "Successfully deleted phase ${order + 1}!",
       ));
     } catch (err) {
       emit(state.copyWith(error: err.toString()));

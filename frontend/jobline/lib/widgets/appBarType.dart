@@ -41,7 +41,6 @@ AppBar buildAppBarType(
               onPressFunction: () {
                 context.go('/signup');
               },
-              radius: 30,
               child: const Text('Sign up',
                   style: TextStyle(color: JoblineColors.white)),
             ),
@@ -60,7 +59,6 @@ AppBar buildAppBarType(
               onPressFunction: () {
                 return context.goNamed('login');
               },
-              radius: 30,
               child: const Text(
                 'Sign in',
                 style: TextStyle(color: JoblineColors.white),
@@ -90,7 +88,6 @@ AppBar buildAppBarType(
               onPressFunction: () {
                 return context.goNamed('login');
               },
-              radius: 30,
               child: const Text(
                 'SIGN IN',
                 style: TextStyle(color: JoblineColors.white),

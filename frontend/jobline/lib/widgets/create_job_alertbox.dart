@@ -18,7 +18,6 @@ void buildAlertDialogBox(BuildContext context, TimelineCubit timelineCubit) {
       actions: [
         Container(
           child: CustomButton(
-              radius: 30,
               onPressFunction: () {
                 _formKey.currentState!.save();
                 if (_formKey.currentState!.validate()) {

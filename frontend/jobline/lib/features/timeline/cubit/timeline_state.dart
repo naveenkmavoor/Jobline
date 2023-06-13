@@ -7,9 +7,10 @@ class TimelineState extends Equatable {
   final CurrentTimeline? currentTimeline;
   final bool stateUpdate;
   final bool isButtonLoading;
+  final bool focusLastTextField;
   final bool isPageLoading;
   final bool isTimelineSuccess;
-
+  final bool isDeleteButtonLoading;
   final TimelineMode timelineMode;
   final String? error;
   final String? successMssg;
@@ -17,7 +18,9 @@ class TimelineState extends Equatable {
   const TimelineState(
       {this.timelines,
       this.error,
+      this.focusLastTextField = false,
       this.successMssg,
+      this.isDeleteButtonLoading = false,
       this.timelineMode = TimelineMode.create,
       this.currentTimeline,
       this.isPageLoading = false,
@@ -28,9 +31,11 @@ class TimelineState extends Equatable {
   TimelineState copyWith(
       {Timelines? timelines,
       String? successMssg,
+      bool? focusLastTextField,
       String? error,
       CurrentTimeline? currentTimeline,
       bool? isPageLoading,
+      bool? isDeleteButtonLoading,
       TimelineMode? timelineMode,
       bool? isTimelineSuccess,
       bool? isButtonLoading,
@@ -38,6 +43,8 @@ class TimelineState extends Equatable {
     return TimelineState(
         timelines: timelines ?? this.timelines,
         error: error,
+        focusLastTextField: focusLastTextField ?? false,
+        isDeleteButtonLoading: isDeleteButtonLoading ?? false,
         successMssg: successMssg ?? this.successMssg,
         timelineMode: timelineMode ?? this.timelineMode,
         currentTimeline: currentTimeline ?? this.currentTimeline,
@@ -52,6 +59,7 @@ class TimelineState extends Equatable {
         timelines,
         stateUpdate,
         currentTimeline,
+        isDeleteButtonLoading,
         isPageLoading,
         timelineMode,
         successMssg,

@@ -4,7 +4,7 @@ class Steps {
   String? description;
   int? eta;
   final String? timelineId;
-  final int? order;
+  int? order;
   final int? v;
 
   Steps({

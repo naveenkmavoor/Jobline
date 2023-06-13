@@ -11,24 +11,20 @@ class CustomButton extends StatelessWidget {
   final Widget child;
   final ButtonState state;
   final Color? backgroundColor;
-  final double radius;
+  final OutlinedBorder? shape;
   const CustomButton(
       {super.key,
       required this.onPressFunction,
       required this.child,
       this.backgroundColor,
-      this.radius = 5,
+      this.shape,
       this.state = ButtonState.enabled});
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(radius),
-          ),
-          backgroundColor: backgroundColor),
+          shape: shape, backgroundColor: backgroundColor),
       onPressed: onPressFunction,
       child: state == ButtonState.enabled
           ? child
