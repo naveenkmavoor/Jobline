@@ -317,11 +317,47 @@ const withdrawStatus = async (req, res, next) => {
     const user = await User.findById(userId);
     const email = user.email;
 
-    const status = await Status.findOne({ timelineId, email });
+    await Status.findOneAndDelete({ timelineId, email });
 
-    status.status = "rejected";
-    await status.save();
-    return res.status(200).send("Sucessfully withdraw");
+    const timeline = await Timeline.findById(timelineId);
+    const recruiterId = timeline.recruiterId;
+
+    const recruiter = await User.findById(recruiterId);
+    const recruiterEmail = recruiter.email;
+
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: recruiterEmail,
+      subject: "Withdrawal Notification",
+      text: `Dear Recruiter,
+    
+    This is to inform you that the timeline for ${timeline.jobTitle} has been withdrawn by the user with email ${email}.
+    
+    Regards,
+    Your Name`,
+    };
+
+    const emailPromise = new Promise((resolve, reject) => {
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(info);
+        }
+      });
+    });
+
+    Promise.all([emailPromise])
+      .then(() => {
+        console.log("Email sent");
+        return res.status(200).json("Successfully sent email");
+      })
+      .catch((error) => {
+        console.error("Error sending email:", error);
+        return res.status(500).json({ error: "Failed to send email" });
+      });
+
+    return res.status(200).json("Sucessfully withdraw");
   } catch (error) {
     next(error);
   }
