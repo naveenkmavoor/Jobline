@@ -184,6 +184,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.1"
+  fuzzy:
+    dependency: "direct main"
+    description:
+      path: "packages/fuzzy_search"
+      relative: true
+    source: path
+    version: "0.0.0"
   go_router:
     dependency: "direct main"
     description:
@@ -232,6 +239,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.7"
+  latinize:
+    dependency: transitive
+    description:
+      name: latinize
+      sha256: "559eaa76d4641d977680b64080806174efabddebac365fc26d1c333aabb4070e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0-nullsafety.0"
   lints:
     dependency: transitive
     description:

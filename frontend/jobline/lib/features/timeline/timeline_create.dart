@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jobline/colors.dart';
+import 'package:jobline/features/manage_candidate/view/manage_candidate.dart';
 import 'package:jobline/features/timeline/cubit/timeline_cubit.dart';
 import 'package:jobline/features/timeline/timeline_main_body.dart';
 import 'package:jobline/shared/data/timeline/timeline_repository.dart';
@@ -24,6 +25,7 @@ class _NavRailExampleState extends State<TimelineCreate> {
   NavigationRailLabelType labelType = NavigationRailLabelType.all;
   bool showLeading = false;
   bool showTrailing = false;
+  final _pageViewcontroller = PageController(initialPage: 0);
   double groupAlignment = -1.0;
   late TimelineCubit timelineCubit;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -164,7 +166,7 @@ class _NavRailExampleState extends State<TimelineCreate> {
                                                     JoblineColors.accentColor,
                                                 size: 50,
                                               ),
-                                              SizedBox(
+                                              const SizedBox(
                                                 height: 30,
                                               ),
                                               Text(
@@ -173,7 +175,7 @@ class _NavRailExampleState extends State<TimelineCreate> {
                                                     .textTheme
                                                     .bodyLarge,
                                               ),
-                                              Text(
+                                              const Text(
                                                   'Your unsaved changes will be lost.\n Save changes before closing?')
                                             ],
                                           ));
@@ -241,7 +243,22 @@ class _NavRailExampleState extends State<TimelineCreate> {
                             ),
                           ),
                           const VerticalDivider(thickness: 1, width: 1),
-                          const Expanded(child: TimelineMainBody())
+                          Expanded(
+                              child: PageView(
+                            onPageChanged: (value) {},
+                            controller: _pageViewcontroller,
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: [
+                              TimelineMainBody(
+                                  pageController: _pageViewcontroller),
+                              if (timelineCubit
+                                      .state.currentTimeline?.timeline !=
+                                  null)
+                                ManageCandidateBody(
+                                  pageController: _pageViewcontroller,
+                                )
+                            ],
+                          ))
                         ],
                       ))));
   }

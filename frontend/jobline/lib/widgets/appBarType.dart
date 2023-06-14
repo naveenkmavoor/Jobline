@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:jobline/colors.dart';
+import 'package:jobline/shared/utility.dart';
+import 'package:jobline/widgets/custom_avatar.dart';
 import 'package:jobline/widgets/custom_button.dart';
 import 'package:jobline/widgets/jobline_title.dart';
 
@@ -19,11 +21,10 @@ AppBar buildAppBarType(
         title: const JoblineTitle(),
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.notifications)),
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              maxRadius: 15,
-              backgroundColor: JoblineColors.neutral25,
+            child: CustomAvatar(
+              name: getUserName()!,
             ),
           )
         ],

@@ -49,6 +49,9 @@ dependencies:
   cookie_jar: ^4.0.2  
   share_plus: ^7.0.2
   flutter_highlight: ^0.7.0 
+  
+  fuzzy: 
+    path: packages/fuzzy_search
 
   timeline_tile: 
     path: packages/timeline_tile

@@ -17,7 +17,8 @@ import 'package:jobline/widgets/custom_button.dart';
 import 'package:jobline/widgets/custom_snackbar.dart';
 
 class TimelineMainBody extends StatelessWidget {
-  const TimelineMainBody({super.key});
+  final PageController? pageController;
+  const TimelineMainBody({super.key, this.pageController});
 
   void _buildDeletecustomAlertDialog(
       BuildContext context, TimelineCubit timelineCubit, Steps step) {
@@ -649,7 +650,16 @@ class TimelineMainBody extends StatelessWidget {
                                               : Row(
                                                   children: [
                                                     CustomButton(
-                                                        onPressFunction: () {},
+                                                        onPressFunction: () {
+                                                          pageController != null
+                                                              ? pageController!.nextPage(
+                                                                  duration: const Duration(
+                                                                      milliseconds:
+                                                                          500),
+                                                                  curve: Curves
+                                                                      .easeIn)
+                                                              : null;
+                                                        },
                                                         child: Text(
                                                           'MANAGE CANDIDATES',
                                                           style: Theme.of(

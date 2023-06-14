@@ -50,21 +50,25 @@ class CurrentTimeline {
 
 class Status {
   final String? id;
+  final String? name;
   final String? stepId;
   final int? stepIdx;
   final String? timelineId;
   final String? status;
   final String? email;
   final int? v;
+  bool? isSelected;
 
   Status({
     this.id,
     this.stepId,
+    this.name,
     this.stepIdx,
     this.timelineId,
     this.status,
     this.email,
     this.v,
+    this.isSelected = false,
   });
 
   Status.fromJson(Map<String, dynamic> json)
@@ -72,12 +76,14 @@ class Status {
         stepId = json['stepId'] as String?,
         stepIdx = json['stepIdx'] as int?,
         timelineId = json['timelineId'] as String?,
+        name = json['name'] as String?,
         status = json['status'] as String?,
         email = json['email'] as String?,
         v = json['__v'] as int?;
 
   Map<String, dynamic> toJson() => {
         '_id': id,
+        'name': name,
         'stepId': stepId,
         'stepIdx': stepIdx,
         'timelineId': timelineId,
@@ -85,4 +91,28 @@ class Status {
         'email': email,
         '__v': v
       };
+
+  Status copyWith({
+    String? id,
+    String? name,
+    String? stepId,
+    int? stepIdx,
+    String? timelineId,
+    String? status,
+    String? email,
+    int? v,
+    bool? isSelected,
+  }) {
+    return Status(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      stepId: stepId ?? this.stepId,
+      stepIdx: stepIdx ?? this.stepIdx,
+      timelineId: timelineId ?? this.timelineId,
+      status: status ?? this.status,
+      email: email ?? this.email,
+      v: v ?? this.v,
+      isSelected: isSelected ?? this.isSelected,
+    );
+  }
 }

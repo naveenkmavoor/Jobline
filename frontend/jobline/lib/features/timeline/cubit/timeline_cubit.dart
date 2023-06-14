@@ -189,7 +189,7 @@ class TimelineCubit extends Cubit<TimelineState> {
       emit(state.copyWith(
           currentTimeline:
               state.currentTimeline?.copyWith(steps: timelines.steps),
-          successMssg: "Successfully created the timeline!",
+          successMssg: "Successfully saved the timeline!",
           timelineMode: TimelineMode.create));
       // getAllTimeline();
     } catch (err) {
