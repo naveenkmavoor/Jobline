@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jobline/colors.dart';
 import 'package:jobline/features/manage_candidate/cubit/manage_candidate_cubit.dart';
 import 'package:jobline/features/timeline/cubit/timeline_cubit.dart';
+import 'package:jobline/shared/data/manage_canididate/manage_candidate_repository.dart';
 import 'package:jobline/shared/data/timeline/models/steps.dart';
 import 'package:jobline/typography/font_weights.dart';
+import 'package:jobline/widgets/custom_alert_dialog.dart';
 import 'package:jobline/widgets/custom_avatar.dart';
+import 'package:jobline/widgets/custom_button.dart';
+import 'package:material_tag_editor/tag_editor.dart';
 
 class ManageCandidateBody extends StatelessWidget {
   final PageController? pageController;
-  const ManageCandidateBody({
+  final _manageCandidateRepository = ManageCandidateRepository();
+  ManageCandidateBody({
     super.key,
     this.pageController,
   });
@@ -70,76 +76,129 @@ class ManageCandidateBody extends StatelessWidget {
                   const SizedBox(
                     height: 8,
                   ),
-                  BlocBuilder<ManageCandidateCubit, ManageCandidateState>(
-                    buildWhen: (previous, current) =>
-                        previous.searchQueryTimeline?.steps?[stepIndex] !=
-                        current.searchQueryTimeline?.steps?[stepIndex]
+                  ListView.builder(
+                      itemCount: manageCubit.state.searchQueryTimeline
+                          ?.steps?[stepIndex].status?.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, subindex) {
+                        if (manageCubit.state.searchQueryTimeline?.steps !=
+                            null) {
+                          final name = manageCubit.state.searchQueryTimeline
+                              ?.steps?[stepIndex].status?[subindex].name;
+                          final email = manageCubit.state.searchQueryTimeline
+                              ?.steps?[stepIndex].status?[subindex].email;
 
-                    // ||
-
-                    //     previous
-                    //                 .copyTimelineDetails
-                    //                 ?.steps?[stepIndex]
-                    //                 .status?[subindex]
-                    //                 .isSelected !=
-                    //             current
-                    //                 .copyTimelineDetails
-                    //                 ?.steps?[stepIndex]
-                    //                 .status?[subindex]
-                    //                 .isSelected
-                    ,
-                    builder: (context, _) {
-                      return ListView.builder(
-                          itemCount: manageCubit.state.searchQueryTimeline
-                              ?.steps?[stepIndex].status?.length,
-                          shrinkWrap: true,
-                          itemBuilder: (context, subindex) {
-                            if (manageCubit.state.searchQueryTimeline?.steps !=
-                                null) {
-                              final name = manageCubit.state.searchQueryTimeline
-                                  ?.steps?[stepIndex].status?[subindex].name;
-                              final email = manageCubit
-                                  .state
-                                  .searchQueryTimeline
-                                  ?.steps?[stepIndex]
-                                  .status?[subindex]
-                                  .email;
-
-                              return InkWell(
-                                onTap: () {
-                                  context
-                                      .read<ManageCandidateCubit>()
-                                      .selectCandidate(
-                                          steps.status![subindex].email!,
-                                          steps.id!);
-                                },
-                                child: ListTile(
-                                  // tileColor: manageCubit
-                                  //         .state
-                                  //         .searchQueryTimeline!
-                                  //         .steps![stepIndex]
-                                  //         .status![subindex]
-                                  //         .isSelected!
-                                  //     ? JoblineColors.lightOrange
-                                  //     : null,
-                                  leading:
-                                      CustomAvatar(name: name ?? email ?? ''),
-                                  title: Text('${name ?? email}'),
-                                  subtitle:
-                                      name != null ? Text('$email') : null,
-                                ),
-                              );
-                            } else {
-                              return const SizedBox.shrink();
-                            }
-                          });
-                    },
-                  )
+                          return InkWell(
+                            onTap: () {
+                              context
+                                  .read<ManageCandidateCubit>()
+                                  .selectCandidate(
+                                      steps.status![subindex].email!,
+                                      steps.id!);
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  color: manageCubit
+                                          .state
+                                          .searchQueryTimeline!
+                                          .steps![stepIndex]
+                                          .status![subindex]
+                                          .isSelected
+                                      ? JoblineColors.lightOrange
+                                      : null),
+                              child: ListTile(
+                                leading:
+                                    CustomAvatar(name: name ?? email ?? ''),
+                                title: Text('${name ?? email}'),
+                                subtitle: name != null ? Text('$email') : null,
+                              ),
+                            ),
+                          );
+                        } else {
+                          return const SizedBox.shrink();
+                        }
+                      })
                 ]),
                 Align(
                     alignment: Alignment.bottomRight,
                     child: FloatingActionButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          List<String> _values = [];
+                          final FocusNode _focusNode = FocusNode();
+                          final TextEditingController _textEditingController =
+                              TextEditingController();
+                          customAlertDialog(
+                              context: context,
+                              actions: [],
+                              body: StatefulBuilder(
+                                  builder: (context, StateSetter setState) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Invite Candidates'),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          flex: 2,
+                                          child: TagEditor(
+                                            length: _values.length,
+                                            controller: _textEditingController,
+                                            focusNode: _focusNode,
+                                            delimiters: [',', ' '],
+                                            hasAddButton: true,
+                                            resetTextOnSubmitted: true,
+                                            // This is set to grey just to illustrate the `textStyle` prop
+                                            textStyle: const TextStyle(),
+                                            onSubmitted: (outstandingValue) {
+                                              setState(() {
+                                                _values.add(outstandingValue);
+                                              });
+                                            },
+                                            inputDecoration:
+                                                const InputDecoration(
+                                              border: InputBorder.none,
+                                              hintText: 'Email Here...',
+                                            ),
+                                            onTagChanged: (newValue) {
+                                              setState(() {
+                                                _values.add(newValue);
+                                              });
+                                            },
+                                            tagBuilder: (context, index) =>
+                                                _Chip(
+                                              index: index,
+                                              label: _values[index],
+                                              onDeleted: (index) {
+                                                setState(() {
+                                                  _values.removeAt(index);
+                                                });
+                                              },
+                                            ),
+                                            // InputFormatters example, this disallow \ and /
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.deny(
+                                                  RegExp(r'[/\\]'))
+                                            ],
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: CustomButton(
+                                              onPressFunction: () {
+                                                context
+                                                    .read<
+                                                        ManageCandidateCubit>()
+                                                    .addCandidate(
+                                                        steps.id!, _values);
+                                              },
+                                              child: Text('SEND INVITE')),
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                );
+                              }));
+                        },
                         child: const Icon(Icons.person_add_alt_1_rounded)))
               ],
             ),
@@ -154,9 +213,11 @@ class ManageCandidateBody extends StatelessWidget {
   Widget _buildPhaseList() {
     return BlocBuilder<ManageCandidateCubit, ManageCandidateState>(
       buildWhen: (previous, current) =>
-          previous.copyTimelineDetails != current.copyTimelineDetails,
+          previous.copyTimelineDetails != current.copyTimelineDetails ||
+          previous.searchQueryTimeline?.steps !=
+              current.searchQueryTimeline?.steps,
       builder: (context, state) {
-        final currentTimeline = state.copyTimelineDetails ??
+        final searchTimeline = state.searchQueryTimeline ??
             context.read<TimelineCubit>().state.currentTimeline!;
         return ListView.separated(
             scrollDirection: Axis.horizontal,
@@ -179,9 +240,9 @@ class ManageCandidateBody extends StatelessWidget {
                         ))
                   ],
                 ),
-            itemCount: currentTimeline.numberOfSteps!,
+            itemCount: searchTimeline.numberOfSteps!,
             itemBuilder: (context, index) =>
-                _buildPhaseCard(currentTimeline.steps![index], context, index));
+                _buildPhaseCard(searchTimeline.steps![index], context, index));
       },
     );
   }
@@ -189,31 +250,61 @@ class ManageCandidateBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return BlocProvider(
-      create: (context) => ManageCandidateCubit()
-        ..getCurrentTimeline(
-            context.read<TimelineCubit>().state.currentTimeline!),
-      child: Column(
-        children: [
-          _buildHeader(
-            textTheme,
-          ),
-          Flexible(
-            flex: 1,
-            fit: FlexFit.tight,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                      alignment: Alignment.center,
-                      height: 400,
-                      child: _buildPhaseList()),
-                ),
-              ],
+    return RepositoryProvider.value(
+      value: _manageCandidateRepository,
+      child: BlocProvider(
+        create: (context) => ManageCandidateCubit(_manageCandidateRepository)
+          ..getCurrentTimeline(
+              context.read<TimelineCubit>().state.currentTimeline!),
+        child: Column(
+          children: [
+            _buildHeader(
+              textTheme,
             ),
-          ),
-        ],
+            Flexible(
+              flex: 1,
+              fit: FlexFit.tight,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                        alignment: Alignment.center,
+                        height: 400,
+                        child: _buildPhaseList()),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+}
+
+class _Chip extends StatelessWidget {
+  const _Chip({
+    required this.label,
+    required this.onDeleted,
+    required this.index,
+  });
+
+  final String label;
+  final ValueChanged<int> onDeleted;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      labelPadding: const EdgeInsets.only(left: 8.0),
+      label: Text(label),
+      deleteIcon: const Icon(
+        Icons.close,
+        size: 18,
+      ),
+      onDeleted: () {
+        onDeleted(index);
+      },
     );
   }
 }

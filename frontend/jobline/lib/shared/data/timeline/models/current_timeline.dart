@@ -57,7 +57,7 @@ class Status {
   final String? status;
   final String? email;
   final int? v;
-  bool? isSelected;
+  bool isSelected = false;
 
   Status({
     this.id,
