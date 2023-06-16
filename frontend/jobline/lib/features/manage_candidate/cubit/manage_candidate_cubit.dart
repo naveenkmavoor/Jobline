@@ -5,6 +5,8 @@ import 'package:jobline/shared/data/timeline/models/current_timeline.dart';
 
 part 'manage_candidate_state.dart';
 
+enum MoveToNextStep { moveToBackStep, moveToFrontStep }
+
 class ManageCandidateCubit extends Cubit<ManageCandidateState> {
   final ManageCandidateRepository repository;
   ManageCandidateCubit(this.repository) : super(const ManageCandidateState());
@@ -81,39 +83,50 @@ class ManageCandidateCubit extends Cubit<ManageCandidateState> {
 
   //move the selected candidate to next steps and set isSelected to false
   void moveToNextStep(
-    int currentStepIndex,
-  ) {
-    final List<Status> statusList =
-        state.copyTimelineDetails!.steps![currentStepIndex].status!;
-    final List<Status> nextStatusList =
-        state.copyTimelineDetails!.steps![currentStepIndex + 1].status!;
-    final List<Status> selectedCandidates =
-        statusList.where((element) => element.isSelected!).toList();
+      {required int currentStepIndex, required MoveToNextStep moveToNextStep}) {
+    final statusList = List<Status>.from(state
+        .copyTimelineDetails!.steps![currentStepIndex].status!
+        .map((e) => e.copyWith()));
+    final List<Status> selectedCandidates = statusList
+        .where((element) => element.isSelected)
+        .map((e) => e.copyWith())
+        .toList();
+    if (selectedCandidates.isEmpty) {
+      return;
+    }
+    int nextStepIndex;
+    if (moveToNextStep == MoveToNextStep.moveToFrontStep) {
+      nextStepIndex = currentStepIndex + 1;
+    } else {
+      nextStepIndex = currentStepIndex - 1;
+    }
+    final nextStatusList = List<Status>.from(state
+        .copyTimelineDetails!.steps![nextStepIndex].status!
+        .map((e) => e.copyWith()));
+
     selectedCandidates.forEach((element) {
       element.isSelected = false;
       nextStatusList.add(element);
     });
-    statusList.removeWhere((element) => element.isSelected!);
-    emit(state.copyWith(
-        copyTimelineDetails: state.copyTimelineDetails!.copyWith(
-            steps: state.copyTimelineDetails!.steps!
-                .map((e) => e.id ==
-                        state.copyTimelineDetails!.steps![currentStepIndex].id
-                    ? e.copyWith(status: statusList)
-                    : e.copyWith())
-                .toList())));
-    emit(state.copyWith(
-        copyTimelineDetails: state.copyTimelineDetails!.copyWith(
-            steps: state.copyTimelineDetails!.steps!.map((e) {
+    statusList.removeWhere((element) => element.isSelected);
+    final resultCopyTimelineDetails = state.copyTimelineDetails!.copyWith(
+        steps: state.copyTimelineDetails!.steps!.map((e) {
       if (e.id == state.copyTimelineDetails!.steps![currentStepIndex].id) {
         return e.copyWith(status: statusList);
-      } else if (e.id ==
-          state.copyTimelineDetails!.steps![currentStepIndex + 1].id) {
+      } else if (e.id == state.copyTimelineDetails!.steps![nextStepIndex].id) {
         return e.copyWith(status: nextStatusList.reversed.toList());
       } else {
         return e.copyWith();
       }
-    }).toList())));
+    }).toList());
+    final resultSearchTimeline = resultCopyTimelineDetails.copyWith(
+        steps: resultCopyTimelineDetails.steps!
+            .map((e) =>
+                e.copyWith(status: e.status!.map((e) => e.copyWith()).toList()))
+            .toList());
+    emit(state.copyWith(
+        searchQueryTimeline: resultSearchTimeline,
+        copyTimelineDetails: resultCopyTimelineDetails));
   }
 
   //search a candidate in a particular step using fuzzy search
@@ -147,6 +160,7 @@ class ManageCandidateCubit extends Cubit<ManageCandidateState> {
   }
 
   Future<void> addCandidate(String stepId, List<String> emails) async {
+    emit(state.copyWith(sendInviteLoading: true));
     final List<Status> statusList = state.copyTimelineDetails!.steps!
         .firstWhere((step) => step.id == stepId)
         .status!;
@@ -159,6 +173,18 @@ class ManageCandidateCubit extends Cubit<ManageCandidateState> {
         stepId: stepId,
         emails: newList);
     emit(state.copyWith(
+        searchQueryTimeline: state.searchQueryTimeline!.copyWith(
+            steps: state.searchQueryTimeline!.steps!
+                .map((e) => e.id == stepId
+                    ? e.copyWith(status: resultEmailLists)
+                    : e.copyWith())
+                .toList()),
+        currentTimelineDetails: state.currentTimelineDetails!.copyWith(
+            steps: state.currentTimelineDetails!.steps!
+                .map((e) => e.id == stepId
+                    ? e.copyWith(status: resultEmailLists)
+                    : e.copyWith())
+                .toList()),
         copyTimelineDetails: state.copyTimelineDetails!.copyWith(
             steps: state.copyTimelineDetails!.steps!
                 .map((e) => e.id == stepId

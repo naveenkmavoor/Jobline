@@ -5,6 +5,7 @@ Future<void> customAlertDialog({
   required BuildContext context,
   required List<Widget> actions,
   required Widget body,
+  final String title = '',
   final String? iconAsset,
   final IconData? icon,
   final bool outsideDismissible = true,
@@ -16,6 +17,7 @@ Future<void> customAlertDialog({
     barrierDismissible: barrierDismissible,
     context: context,
     builder: (BuildContext context) {
+      final textTheme = Theme.of(context).textTheme;
       return WillPopScope(
         onWillPop: () async {
           if (popFunction != null) {
@@ -30,21 +32,36 @@ Future<void> customAlertDialog({
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
           backgroundColor: JoblineColors.white,
           children: <Widget>[
-            Align(
-              alignment: Alignment.topRight,
-              child: IconButton(
-                iconSize: 20,
-                icon: const Icon(
-                  Icons.close,
-                  color: JoblineColors.neutral25,
+            Row(
+              children: [
+                title.isNotEmpty
+                    ? Expanded(
+                        child: Text(
+                          title,
+                          style: textTheme.headlineMedium,
+                        ),
+                      )
+                    : const SizedBox(),
+                Align(
+                  alignment: Alignment.topRight,
+                  child: IconButton(
+                    iconSize: 20,
+                    icon: const Icon(
+                      Icons.close,
+                      color: JoblineColors.neutral25,
+                    ),
+                    onPressed: () {
+                      if (popFunction != null) {
+                        popFunction();
+                      }
+                      Navigator.of(context).pop();
+                    },
+                  ),
                 ),
-                onPressed: () {
-                  if (popFunction != null) {
-                    popFunction();
-                  }
-                  Navigator.of(context).pop();
-                },
-              ),
+              ],
+            ),
+            const SizedBox(
+              height: 8,
             ),
             body,
             actions.isNotEmpty
