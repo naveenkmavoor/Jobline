@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jobline/colors.dart';
 
 typedef OnPressFunction = Function();
 
@@ -11,12 +12,14 @@ class CustomButton extends StatelessWidget {
   final Widget child;
   final ButtonState state;
   final Color? backgroundColor;
+  final bool isDisable;
   final OutlinedBorder? shape;
   const CustomButton(
       {super.key,
       required this.onPressFunction,
       required this.child,
       this.backgroundColor,
+      this.isDisable = false,
       this.shape,
       this.state = ButtonState.enabled});
 
@@ -24,7 +27,9 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-          shape: shape, backgroundColor: backgroundColor),
+          shape: shape,
+          backgroundColor:
+              isDisable ? JoblineColors.neutralLight : backgroundColor),
       onPressed: onPressFunction,
       child: state == ButtonState.enabled
           ? child

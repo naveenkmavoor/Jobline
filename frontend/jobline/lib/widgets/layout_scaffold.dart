@@ -12,6 +12,7 @@ class LayoutScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: key,
       appBar: appBarTypes != null
           ? buildAppBarType(
               context: context,

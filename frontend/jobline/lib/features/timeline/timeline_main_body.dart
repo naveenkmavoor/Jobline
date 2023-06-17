@@ -61,10 +61,7 @@ class TimelineMainBody extends StatelessWidget {
                           ? const CircularProgressIndicator()
                           : Text(
                               'DELETE',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelLarge!
-                                  .copyWith(color: JoblineColors.white),
+                              style: Theme.of(context).textTheme.labelLarge!,
                             );
                     },
                   ))
@@ -75,7 +72,7 @@ class TimelineMainBody extends StatelessWidget {
           children: [
             const Icon(
               Icons.info_outline_rounded,
-              color: JoblineColors.accentColor,
+              color: JoblineColors.primaryColor,
               size: 50,
             ),
             const SizedBox(
@@ -119,7 +116,6 @@ class TimelineMainBody extends StatelessWidget {
                   },
                   child: const Text(
                     'CREATE TIMELINE',
-                    style: TextStyle(color: JoblineColors.white),
                   )),
               const SizedBox(
                 height: 24,
@@ -489,7 +485,6 @@ class TimelineMainBody extends StatelessWidget {
                   },
                   child: const Text(
                     'CREATE TIMELINE',
-                    style: TextStyle(color: JoblineColors.white),
                   )),
               const SizedBox(
                 height: 24,
@@ -633,14 +628,10 @@ class TimelineMainBody extends StatelessWidget {
                                                       ? const CircularProgressIndicator()
                                                       : Text(
                                                           'Save Timeline',
-                                                          style: Theme.of(
-                                                                  context)
-                                                              .textTheme
-                                                              .labelLarge!
-                                                              .copyWith(
-                                                                  color:
-                                                                      JoblineColors
-                                                                          .white),
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .labelLarge!,
                                                         );
                                                 },
                                               ))
@@ -661,16 +652,11 @@ class TimelineMainBody extends StatelessWidget {
                                                               : null;
                                                         },
                                                         child: Text(
-                                                          'MANAGE CANDIDATES',
-                                                          style: Theme.of(
-                                                                  context)
-                                                              .textTheme
-                                                              .labelLarge!
-                                                              .copyWith(
-                                                                  color:
-                                                                      JoblineColors
-                                                                          .white),
-                                                        )),
+                                                            'MANAGE CANDIDATES',
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .labelLarge!)),
                                                     Padding(
                                                       padding: const EdgeInsets
                                                               .symmetric(
@@ -698,10 +684,6 @@ class TimelineMainBody extends StatelessWidget {
                                                             ),
                                                             Text(
                                                               'EDIT TIMELINE',
-                                                              style: TextStyle(
-                                                                  color:
-                                                                      JoblineColors
-                                                                          .white),
                                                             )
                                                           ],
                                                         ),

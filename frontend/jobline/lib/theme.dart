@@ -107,14 +107,13 @@ class JoblineTheme {
   static ElevatedButtonThemeData get _elevatedButtonTheme {
     return ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
+        foregroundColor: JoblineColors.white,
         elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-        backgroundColor: JoblineColors.accentColor,
+        backgroundColor: JoblineColors.primaryColor,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(30)),
         ),
-        textStyle: const TextStyle(color: JoblineColors.red),
-        minimumSize: const Size(150, 54),
+        minimumSize: const Size(145, 54),
       ),
     );
   }
@@ -122,13 +121,14 @@ class JoblineTheme {
   static OutlinedButtonThemeData get _outlinedButtonTheme {
     return OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        foregroundColor: JoblineColors.white,
+        foregroundColor: JoblineColors.primaryColor,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(30)),
         ),
-        side: const BorderSide(color: JoblineColors.white, width: 2),
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        minimumSize: const Size(208, 54),
+        side: const BorderSide(
+          color: JoblineColors.primaryColor,
+        ),
+        minimumSize: const Size(145, 54),
       ),
     );
   }

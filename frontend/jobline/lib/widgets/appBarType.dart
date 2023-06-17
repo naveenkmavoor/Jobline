@@ -42,8 +42,9 @@ AppBar buildAppBarType(
               onPressFunction: () {
                 context.go('/signup');
               },
-              child: const Text('Sign up',
-                  style: TextStyle(color: JoblineColors.white)),
+              child: const Text(
+                'Sign up',
+              ),
             ),
           )
         ],
@@ -62,7 +63,6 @@ AppBar buildAppBarType(
               },
               child: const Text(
                 'Sign in',
-                style: TextStyle(color: JoblineColors.white),
               ),
             ),
           )
@@ -80,7 +80,7 @@ AppBar buildAppBarType(
             },
             child: const Text(
               'SIGN UP',
-              style: TextStyle(color: JoblineColors.accentColor),
+              style: TextStyle(color: JoblineColors.primaryColor),
             ),
           ),
           Padding(
@@ -91,7 +91,6 @@ AppBar buildAppBarType(
               },
               child: const Text(
                 'SIGN IN',
-                style: TextStyle(color: JoblineColors.white),
               ),
             ),
           )

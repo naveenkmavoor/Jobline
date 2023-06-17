@@ -48,7 +48,7 @@ void customSnackBar(
                       style: Theme.of(context)
                           .textTheme
                           .labelLarge!
-                          .copyWith(color: JoblineColors.accentColor),
+                          .copyWith(color: JoblineColors.primaryColor),
                     ),
                   ),
                   InkWell(

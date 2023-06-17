@@ -229,7 +229,7 @@ class _SignUpFormState extends State<SignUpForm> {
                       variant: Variant.filled,
                       fillColor: JoblineColors.neutralLight,
                       borderColor: JoblineColors.transparent,
-                      inputColor: JoblineColors.accentColor,
+                      inputColor: JoblineColors.primaryColor,
                       errorText:
                           state.fname.invalid ? "Full Name is required" : null,
                     );
@@ -259,7 +259,7 @@ class _SignUpFormState extends State<SignUpForm> {
                         },
                         fillColor: JoblineColors.neutralLight,
                         borderColor: JoblineColors.transparent,
-                        inputColor: JoblineColors.accentColor,
+                        inputColor: JoblineColors.primaryColor,
                         errorText: state.email.invalid
                             ? _showEmailErrorMessage(state.email.error)
                             : null);
@@ -292,7 +292,7 @@ class _SignUpFormState extends State<SignUpForm> {
                           variant: Variant.filled,
                           fillColor: JoblineColors.neutralLight,
                           borderColor: JoblineColors.transparent,
-                          inputColor: JoblineColors.accentColor,
+                          inputColor: JoblineColors.primaryColor,
                           obscureText: !showpassword,
                           errorText: state.password.invalid
                               ? "Password is required"
@@ -463,10 +463,7 @@ class _SignUpFormState extends State<SignUpForm> {
                             },
                             child: const Padding(
                               padding: EdgeInsets.all(9.0),
-                              child: Text(
-                                'Sign up',
-                                style: TextStyle(color: JoblineColors.white),
-                              ),
+                              child: Text('Sign up'),
                             ),
                           ),
                         ),

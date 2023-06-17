@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:jobline/shared/data/manage_canididate/manage_candidate_repository.dart';
@@ -13,6 +15,8 @@ class ManageCandidateCubit extends Cubit<ManageCandidateState> {
 
   void getCurrentTimeline(CurrentTimeline currentTimeline) {
     emit(state.copyWith(
+        accountsMoved: [],
+        accountsNotMoved: [],
         copyTimelineDetails: currentTimeline.copyWith(
             steps: currentTimeline.steps!
                 .map((e) => e.copyWith(
@@ -160,36 +164,109 @@ class ManageCandidateCubit extends Cubit<ManageCandidateState> {
   }
 
   Future<void> addCandidate(String stepId, List<String> emails) async {
-    emit(state.copyWith(sendInviteLoading: true));
+    emit(state.copyWith(sendLoading: true));
     final List<Status> statusList = state.copyTimelineDetails!.steps!
         .firstWhere((step) => step.id == stepId)
         .status!;
     final newList =
         List<String>.from(statusList.map((element) => element.email));
     newList.addAll(emails);
+    try {
+      final resultEmailLists = await repository.addCandidateRepo(
+          timelineId: state.currentTimelineDetails!.timeline!.id!,
+          stepId: stepId,
+          emails: newList);
+      emit(state.copyWith(
+          searchQueryTimeline: state.searchQueryTimeline!.copyWith(
+              steps: state.searchQueryTimeline!.steps!
+                  .map((e) => e.id == stepId
+                      ? e.copyWith(
+                          status: resultEmailLists
+                              .map((e) => e.copyWith())
+                              .toList())
+                      : e.copyWith())
+                  .toList()),
+          currentTimelineDetails: state.currentTimelineDetails!.copyWith(
+              steps: state.currentTimelineDetails!.steps!
+                  .map((e) => e.id == stepId
+                      ? e.copyWith(
+                          status: resultEmailLists
+                              .map((e) => e.copyWith())
+                              .toList())
+                      : e.copyWith())
+                  .toList()),
+          copyTimelineDetails: state.copyTimelineDetails!.copyWith(
+              steps: state.copyTimelineDetails!.steps!
+                  .map((e) => e.id == stepId
+                      ? e.copyWith(status: resultEmailLists.map((e) => e.copyWith()).toList())
+                      : e.copyWith())
+                  .toList())));
+    } catch (err) {
+      emit(state.copyWith(error: "Failed to add candidate. Please try again."));
+    }
     //repository
-    final resultEmailLists = await repository.addCandidateRepo(
-        timelineId: state.currentTimelineDetails!.timeline!.id!,
-        stepId: stepId,
-        emails: newList);
+  }
+
+  void reviewChanges() {
+    //compare candidate email is and step id is equal or not
+//if not equal then then this candidate is moved to another step
+
+//compare the currentTimelineDetails and copyTimelineDetails and find the difference between the step id
+//if the step id is not matching then this candidate is moved to another step
+    final accountsMoved = <Status>[];
+    final accountsNotMoved = <Status>[];
+    final currentStepList = state.currentTimelineDetails!.steps!;
+    final copyStepList = state.copyTimelineDetails!.steps!;
+
+    for (int i = 0; i < currentStepList.length; i++) {
+      for (var status in currentStepList[i].status!) {
+        final val = copyStepList[i].status?.firstWhere(
+              (element) => element.email == status.email,
+              orElse: () => Status(),
+            );
+        if (val?.email != null) {
+          accountsNotMoved.add(status.copyWith());
+        } else {
+          accountsMoved.add(status.copyWith());
+        }
+      }
+    }
+
+    //find the phase name of moved accounts in copyTimelineDetails
+
+    for (var status in accountsMoved) {
+      for (var copyStep in copyStepList) {
+        final statusval = copyStep.status?.firstWhere(
+          (element) => element.email == status.email,
+          orElse: () => Status(),
+        );
+        if (statusval?.email != null) {
+          status.stepTitle = copyStep.name;
+          status.stepId = copyStep.id;
+          break;
+        }
+      }
+    }
+
     emit(state.copyWith(
-        searchQueryTimeline: state.searchQueryTimeline!.copyWith(
-            steps: state.searchQueryTimeline!.steps!
-                .map((e) => e.id == stepId
-                    ? e.copyWith(status: resultEmailLists)
-                    : e.copyWith())
-                .toList()),
-        currentTimelineDetails: state.currentTimelineDetails!.copyWith(
-            steps: state.currentTimelineDetails!.steps!
-                .map((e) => e.id == stepId
-                    ? e.copyWith(status: resultEmailLists)
-                    : e.copyWith())
-                .toList()),
-        copyTimelineDetails: state.copyTimelineDetails!.copyWith(
-            steps: state.copyTimelineDetails!.steps!
-                .map((e) => e.id == stepId
-                    ? e.copyWith(status: resultEmailLists)
-                    : e.copyWith())
-                .toList())));
+        accountsMoved: accountsMoved, accountsNotMoved: accountsNotMoved));
+  }
+
+  Future<void> moveCandidates() async {
+    emit(state.copyWith(sendLoading: true));
+    try {
+      await repository.moveCandidatesRepo(
+        timelineId: state.currentTimelineDetails!.timeline!.id!,
+        accountsMoved: state.accountsMoved,
+      );
+      emit(state.copyWith(
+          successMssg: "Candidates moved successfully",
+          sendLoading: false,
+          accountsMoved: [],
+          accountsNotMoved: []));
+    } catch (err) {
+      emit(state.copyWith(
+          error: "Failed to move candidates. Please try again."));
+    }
   }
 }

@@ -26,7 +26,7 @@ abstract class JoblineColors {
   /// Blue
   static const Color blue = Color(0xFF428EFF);
 
-  static const Color accentColor = Color(0xFF14213D);
+  static const Color primaryColor = Color(0xFF14213D);
 
   static const Color neutralLight = Color(0xFFD9D9D9);
 

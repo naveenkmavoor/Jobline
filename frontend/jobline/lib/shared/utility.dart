@@ -144,6 +144,33 @@ CurrentTimeline getDummyTimelineData() {
             "status": "Pending",
             "email": "sarath@gmail.com",
             "__v": 0
+          },
+          {
+            "_id": "648dec7acb84aed759155684",
+            "stepId": "648a19025d001caf67b5f0e9",
+            "stepIdx": 0,
+            "timelineId": "6487505e2e88c2ae502b79eb",
+            "status": "Pending",
+            "email": "ronin@gmail.com",
+            "__v": 0
+          },
+          {
+            "_id": "648def3c73de394c3cae43f5",
+            "stepId": "648a19025d001caf67b5f0e9",
+            "stepIdx": 0,
+            "timelineId": "6487505e2e88c2ae502b79eb",
+            "status": "Pending",
+            "email": "samaltman@gmail.com",
+            "__v": 0
+          },
+          {
+            "_id": "648def3c73de394c3cae43f7",
+            "stepId": "648a19025d001caf67b5f0e9",
+            "stepIdx": 0,
+            "timelineId": "6487505e2e88c2ae502b79eb",
+            "status": "Pending",
+            "email": "marksukerberg@gmail.com",
+            "__v": 0
           }
         ],
         "__v": 0
@@ -155,7 +182,17 @@ CurrentTimeline getDummyTimelineData() {
         "eta": 6,
         "timelineId": "6487505e2e88c2ae502b79eb",
         "order": 1,
-        "status": [],
+        "status": [
+          {
+            "_id": "648d57a89ac8f2919b5ae126",
+            "stepId": "648a19025d001caf67b5f0eb",
+            "stepIdx": 0,
+            "timelineId": "6487505e2e88c2ae502b79eb",
+            "status": "Pending",
+            "email": "fgfdg@fgdf.fg",
+            "__v": 0
+          }
+        ],
         "__v": 0
       },
       {
@@ -165,7 +202,35 @@ CurrentTimeline getDummyTimelineData() {
         "eta": 3,
         "timelineId": "6487505e2e88c2ae502b79eb",
         "order": 2,
-        "status": [],
+        "status": [
+          {
+            "_id": "648d55b26db1eeb6adaf6467",
+            "stepId": "648a19025d001caf67b5f0ed",
+            "stepIdx": 0,
+            "timelineId": "6487505e2e88c2ae502b79eb",
+            "status": "Pending",
+            "email": "witwicky@gmail.com",
+            "__v": 0
+          },
+          {
+            "_id": "648d55b26db1eeb6adaf6469",
+            "stepId": "648a19025d001caf67b5f0ed",
+            "stepIdx": 0,
+            "timelineId": "6487505e2e88c2ae502b79eb",
+            "status": "Pending",
+            "email": "optimus@gmail.com",
+            "__v": 0
+          },
+          {
+            "_id": "648d56665b38ed60dcb1a646",
+            "stepId": "648a19025d001caf67b5f0ed",
+            "stepIdx": 0,
+            "timelineId": "6487505e2e88c2ae502b79eb",
+            "status": "Pending",
+            "email": "sdfsaf@sdfs.dfg",
+            "__v": 0
+          }
+        ],
         "__v": 0
       },
       {

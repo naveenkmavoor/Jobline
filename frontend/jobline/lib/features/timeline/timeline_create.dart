@@ -33,6 +33,7 @@ class _NavRailExampleState extends State<TimelineCreate> {
   String? companyName;
   String? jobLinktoPost;
   int? totalPhases;
+
   final listNavigationRailDestinationWhenEmpty =
       const <NavigationRailDestination>[
     //if no element in the list then
@@ -178,7 +179,7 @@ class _NavRailExampleState extends State<TimelineCreate> {
                                                   const Icon(
                                                     Icons.info_outline_rounded,
                                                     color: JoblineColors
-                                                        .accentColor,
+                                                        .primaryColor,
                                                     size: 50,
                                                   ),
                                                   const SizedBox(
@@ -222,9 +223,6 @@ class _NavRailExampleState extends State<TimelineCreate> {
                                                 ),
                                                 Text(
                                                   'NEW TIMELINE',
-                                                  style: TextStyle(
-                                                      color:
-                                                          JoblineColors.white),
                                                 )
                                               ],
                                             ),

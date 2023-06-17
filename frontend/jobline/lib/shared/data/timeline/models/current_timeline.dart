@@ -4,13 +4,11 @@ import 'package:jobline/shared/data/timeline/models/timeline.dart';
 class CurrentTimeline {
   final Timeline? timeline;
   final List<Steps>? steps;
-  final List<Status>? status;
   final int? numberOfSteps;
 
   CurrentTimeline({
     this.timeline,
     this.steps,
-    this.status,
     this.numberOfSteps,
   });
 
@@ -21,15 +19,11 @@ class CurrentTimeline {
         steps = (json['steps'] as List?)
             ?.map((dynamic e) => Steps.fromJson(e as Map<String, dynamic>))
             .toList(),
-        status = (json['status'] as List?)
-            ?.map((dynamic e) => Status.fromJson(e as Map<String, dynamic>))
-            .toList(),
         numberOfSteps = json['numberOfSteps'] as int?;
 
   Map<String, dynamic> toJson() => {
         'timeline': timeline?.toJson(),
         'steps': steps?.map((e) => e.toJson()).toList(),
-        'status': status?.map((e) => e.toJson()).toList(),
         'numberOfSteps': numberOfSteps
       };
 
@@ -42,7 +36,6 @@ class CurrentTimeline {
     return CurrentTimeline(
       timeline: timeline ?? this.timeline,
       steps: steps ?? this.steps,
-      status: status ?? this.status,
       numberOfSteps: numberOfSteps ?? this.numberOfSteps,
     );
   }
@@ -51,12 +44,13 @@ class CurrentTimeline {
 class Status {
   final String? id;
   final String? name;
-  final String? stepId;
+  String? stepId;
   final int? stepIdx;
   final String? timelineId;
   final String? status;
   final String? email;
   final int? v;
+  String? stepTitle;
   bool isSelected = false;
 
   Status({
@@ -67,6 +61,7 @@ class Status {
     this.timelineId,
     this.status,
     this.email,
+    this.stepTitle,
     this.v,
     this.isSelected = false,
   });
@@ -101,6 +96,7 @@ class Status {
     String? status,
     String? email,
     int? v,
+    String? stepTitle,
     bool? isSelected,
   }) {
     return Status(
@@ -111,6 +107,7 @@ class Status {
       timelineId: timelineId ?? this.timelineId,
       status: status ?? this.status,
       email: email ?? this.email,
+      stepTitle: stepTitle ?? this.stepTitle,
       v: v ?? this.v,
       isSelected: isSelected ?? this.isSelected,
     );

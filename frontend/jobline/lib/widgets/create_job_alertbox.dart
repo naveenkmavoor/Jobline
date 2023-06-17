@@ -44,7 +44,6 @@ void buildAlertDialogBox(BuildContext context, TimelineCubit timelineCubit) {
                       ? const CircularProgressIndicator()
                       : const Text(
                           'CREATE TIMELINE',
-                          style: TextStyle(color: JoblineColors.white),
                         );
                 },
               )),

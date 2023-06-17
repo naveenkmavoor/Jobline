@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:jobline/colors.dart';
 
 Future<void> customAlertDialog({
@@ -16,8 +17,8 @@ Future<void> customAlertDialog({
   final result = await showDialog(
     barrierDismissible: barrierDismissible,
     context: context,
-    builder: (BuildContext context) {
-      final textTheme = Theme.of(context).textTheme;
+    builder: (BuildContext ctx) {
+      final textTheme = Theme.of(ctx).textTheme;
       return WillPopScope(
         onWillPop: () async {
           if (popFunction != null) {
@@ -54,7 +55,7 @@ Future<void> customAlertDialog({
                       if (popFunction != null) {
                         popFunction();
                       }
-                      Navigator.of(context).pop();
+                      ctx.pop();
                     },
                   ),
                 ),

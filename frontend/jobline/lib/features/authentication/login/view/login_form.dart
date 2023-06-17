@@ -184,7 +184,7 @@ class _LoginFormState extends State<LoginForm> {
                         },
                         fillColor: JoblineColors.neutralLight,
                         borderColor: JoblineColors.transparent,
-                        inputColor: JoblineColors.accentColor,
+                        inputColor: JoblineColors.primaryColor,
                         errorText: state.email.invalid && state.showTextFieldErr
                             ? _showEmailErrorMessage(state.email.error)
                             : null);
@@ -210,7 +210,7 @@ class _LoginFormState extends State<LoginForm> {
                       variant: Variant.filled,
                       fillColor: JoblineColors.neutralLight,
                       borderColor: JoblineColors.transparent,
-                      inputColor: JoblineColors.accentColor,
+                      inputColor: JoblineColors.primaryColor,
                       obscureText: !showpassword,
                       errorText:
                           state.password.invalid ? passwordRequired : null,
@@ -224,7 +224,7 @@ class _LoginFormState extends State<LoginForm> {
                           showpassword
                               ? Icons.visibility
                               : Icons.visibility_off,
-                          color: JoblineColors.accentColor,
+                          color: JoblineColors.primaryColor,
                         ),
                       ),
                     );
@@ -268,10 +268,9 @@ class _LoginFormState extends State<LoginForm> {
                             },
                             child: const Padding(
                               padding: EdgeInsets.all(9.0),
-                              child: Text('Sign in',
-                                  style: TextStyle(
-                                    color: JoblineColors.white,
-                                  )),
+                              child: Text(
+                                'Sign in',
+                              ),
                             ),
                           ),
                         ),

@@ -21,4 +21,16 @@ class ManageCandidateRepository {
       throw DioExceptions.fromDioError(e);
     }
   }
+
+  Future<void> moveCandidatesRepo({
+    required String timelineId,
+    required List<Status> accountsMoved,
+  }) async {
+    try {
+      await _manageCandidateApi.moveCandidatesApi(
+          timelineId: timelineId, accountsMoved: accountsMoved);
+    } on DioError catch (e) {
+      throw DioExceptions.fromDioError(e);
+    }
+  }
 }
