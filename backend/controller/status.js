@@ -86,7 +86,7 @@ const getUserStatus = async (req, res, next) => {
     // Retrieve the status document for the specified timeline and email
     const status = await Status.findOne({ timelineId, email });
     if (!status) {
-      return res.send("Status not found for the user and timeline");
+      return res.status(400).send("Status not found for the user and timeline");
     }
 
     const stepId = status.stepId;
