@@ -40,12 +40,12 @@ class TimelineRepository {
     }
   }
 
-  Future<CurrentTimeline> updateTimelineRepo(
-      List<Steps> steps, String jobId) async {
+  Future<void> updateTimelineRepo(List<Steps> steps, String jobId) async {
     try {
       final Response response = await _timelineApi.updateTimeline(steps, jobId);
 
-      return CurrentTimeline.fromJson(response.data);
+//will uncomment when the changes is done in the backend
+      //! return CurrentTimeline.fromJson(response.data);
     } on DioError catch (e) {
       throw DioExceptions.fromDioError(e);
     }
@@ -54,6 +54,22 @@ class TimelineRepository {
   Future<void> deletePhaseRepo(String stepId) async {
     try {
       await _timelineApi.deletePhaseApi(stepId);
+    } on DioError catch (e) {
+      throw DioExceptions.fromDioError(e);
+    }
+  }
+
+  Future<void> withdrawTimelineRepo(String jobId) async {
+    try {
+      await _timelineApi.withdrawTimelineApi(jobId);
+    } on DioError catch (e) {
+      throw DioExceptions.fromDioError(e);
+    }
+  }
+
+  Future<void> verifyCandidateRepo(String jobId) async {
+    try {
+      await _timelineApi.verifyCandidateApi(jobId);
     } on DioError catch (e) {
       throw DioExceptions.fromDioError(e);
     }

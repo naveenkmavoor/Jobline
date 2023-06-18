@@ -7,6 +7,7 @@ import 'package:jobline/shared/data/authentication/authentication_api.dart';
 import 'package:jobline/shared/data/authentication/models/user.dart';
 import 'package:jobline/shared/data/network_client/dio_client.dart';
 import 'package:jobline/shared/data/network_client/dio_exception.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 /// {@template authentication_repository}
 /// Repository which manages user authentication.
@@ -46,9 +47,11 @@ class AuthenticationRepository {
           id: response.data['user']['_id'] ?? "1",
           name: response.data['user']['name'],
           token: response.data['user']['token']);
-
+      final token = _user!.token!;
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      final accType = decodedToken['role'];
       Hive.box('appBox').putAll({
-        // 'accType': response.data['checkUser']['role'],
+        'accType': accType,
         'email': response.data['user']['email'],
         'id': response.data['user']['_id'] ?? "1",
         'name': response.data['user']['name'],

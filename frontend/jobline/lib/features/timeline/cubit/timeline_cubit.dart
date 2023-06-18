@@ -5,6 +5,7 @@ import 'package:jobline/shared/data/timeline/models/job.dart';
 import 'package:jobline/shared/data/timeline/models/steps.dart';
 import 'package:jobline/shared/data/timeline/models/timeline.dart';
 import 'package:jobline/shared/data/timeline/timeline_repository.dart';
+import 'package:jobline/shared/utility.dart';
 
 part 'timeline_state.dart';
 
@@ -16,19 +17,29 @@ class TimelineCubit extends Cubit<TimelineState> {
   Future<void> getAllTimeline() async {
     try {
       emit(state.copyWith(isPageLoading: true));
-      final timelines = await timelineRepository.getAllTimelineRepo();
+
+      Timelines? timelines;
       Timelines? reverseTimelines;
       CurrentTimeline? currentTimeline;
-      if (timelines.timelines != null && timelines.timelines!.isNotEmpty) {
-        //reversing the job timeline to show the most recently added to the first
-        reverseTimelines =
-            Timelines(timelines: timelines.timelines!.reversed.toList());
-        final jobId = reverseTimelines.timelines?[0].id;
-        currentTimeline = await timelineRepository.getTimelineRepo(jobId!);
+      if (getUserRole() == 'candidate' && getTimelineId() != null) {
+        currentTimeline =
+            await timelineRepository.getTimelineRepo(getTimelineId()!);
+        timelines = Timelines(timelines: [currentTimeline.timeline!]);
+      } else {
+        timelines = await timelineRepository.getAllTimelineRepo();
+
+        if (timelines.timelines != null && timelines.timelines!.isNotEmpty) {
+          //reversing the job timeline to show the most recently added to the first
+          reverseTimelines =
+              Timelines(timelines: timelines.timelines!.reversed.toList());
+          final jobId = reverseTimelines.timelines?[0].id;
+
+          currentTimeline = await timelineRepository.getTimelineRepo(jobId!);
+        }
       }
 
       emit(state.copyWith(
-        timelines: reverseTimelines,
+        timelines: reverseTimelines ?? timelines,
         isTimelineSuccess: false,
         currentTimeline: currentTimeline,
       ));
@@ -54,15 +65,16 @@ class TimelineCubit extends Cubit<TimelineState> {
     }
   }
 
-  Future<void> getTimelineWithId(String id) async {
+  Future<void> getTimelineWithId(
+      {required String id,
+      TimelineMode timelineMode = TimelineMode.general}) async {
     emit(state.copyWith(
       isPageLoading: true,
     ));
     try {
       final currentTimeline = await timelineRepository.getTimelineRepo(id);
       emit(state.copyWith(
-          currentTimeline: currentTimeline,
-          timelineMode: TimelineMode.general));
+          currentTimeline: currentTimeline, timelineMode: timelineMode));
     } catch (err) {
       emit(state.copyWith(
         error: err.toString(),
@@ -173,7 +185,7 @@ class TimelineCubit extends Cubit<TimelineState> {
 
       emit(state.copyWith(
         currentTimeline: state.currentTimeline?.copyWith(steps: newlist),
-        successMssg: "Successfully deleted phase ${order + 1}!",
+        successMssg: "Successfully deleted phase!",
       ));
     } catch (err) {
       emit(state.copyWith(error: err.toString()));
@@ -185,13 +197,50 @@ class TimelineCubit extends Cubit<TimelineState> {
     try {
       final timelines =
           await timelineRepository.updateTimelineRepo(steps, jobId);
-
+      //! comment the below line when the changes is done in the backend
+      final currentTimeline = await timelineRepository.getTimelineRepo(jobId);
       emit(state.copyWith(
           currentTimeline:
-              state.currentTimeline?.copyWith(steps: timelines.steps),
+              state.currentTimeline?.copyWith(steps: currentTimeline.steps),
           successMssg: "Successfully saved the timeline!",
           timelineMode: TimelineMode.create));
       // getAllTimeline();
+    } catch (err) {
+      emit(state.copyWith(error: err.toString()));
+    }
+  }
+
+  Future<void> withdrawTimeline() async {
+    emit(state.copyWith(isButtonLoading: true));
+    try {
+      await timelineRepository
+          .withdrawTimelineRepo(state.currentTimeline!.timeline!.id!);
+      state.timelines?.timelines?.removeWhere(
+          (element) => element.id == state.currentTimeline!.timeline!.id);
+      emit(state.copyWith(
+          timelines: Timelines(),
+          isWithdrawn: true,
+          currentTimeline: CurrentTimeline(),
+          successMssg: "Successfully withdrawn from the timeline!",
+          timelineMode: TimelineMode.create));
+    } catch (err) {
+      emit(state.copyWith(error: err.toString()));
+    }
+  }
+
+  Future<void> verifyCandidate() async {
+    try {
+      await timelineRepository
+          .verifyCandidateRepo(state.currentTimeline!.timeline!.id!);
+      putVerified(true);
+      deleteTimelineId();
+      emit(state.copyWith(
+          currentTimeline: state.currentTimeline?.copyWith(
+              steps: state.currentTimeline?.steps
+                  ?.map((e) => e.copyWith())
+                  .toList()),
+          successMssg: "Invitation confirmed!",
+          timelineMode: TimelineMode.create));
     } catch (err) {
       emit(state.copyWith(error: err.toString()));
     }

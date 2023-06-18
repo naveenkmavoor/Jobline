@@ -11,10 +11,11 @@ class ManageCandidateRepository {
   Future<List<Status>> addCandidateRepo(
       {required String timelineId,
       required String stepId,
+      required String link,
       required List<String> emails}) async {
     try {
       final Response response = await _manageCandidateApi.addCandidateApi(
-          timelineId: timelineId, stepId: stepId, emails: emails);
+          timelineId: timelineId, stepId: stepId, emails: emails, link: link);
 
       return response.data.map<Status>((e) => Status.fromJson(e)).toList();
     } on DioError catch (e) {

@@ -74,7 +74,7 @@ AppBar buildAppBarType(
         automaticallyImplyLeading: false,
         title: const JoblineTitle(),
         actions: [
-          TextButton(
+          OutlinedButton(
             onPressed: () {
               return context.goNamed('signup');
             },

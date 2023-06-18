@@ -11,11 +11,12 @@ class ManageCandidateApi {
   Future<Response> addCandidateApi(
       {required String timelineId,
       required String stepId,
+      required String link,
       required List<String> emails}) async {
     try {
       final Response response = await dioClient.post(
           '/api/user/timeline/$timelineId/step/$stepId',
-          data: json.encode({"emails": emails}));
+          data: json.encode({"emails": emails, "link": link}));
 
       return response;
     } catch (err) {

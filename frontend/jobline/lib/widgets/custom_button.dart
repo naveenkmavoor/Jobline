@@ -14,12 +14,16 @@ class CustomButton extends StatelessWidget {
   final Color? backgroundColor;
   final bool isDisable;
   final OutlinedBorder? shape;
+  final double? elevation;
+  final Size? minSize;
   const CustomButton(
       {super.key,
       required this.onPressFunction,
       required this.child,
       this.backgroundColor,
+      this.elevation,
       this.isDisable = false,
+      this.minSize,
       this.shape,
       this.state = ButtonState.enabled});
 
@@ -27,7 +31,9 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
+          minimumSize: minSize,
           shape: shape,
+          elevation: elevation,
           backgroundColor:
               isDisable ? JoblineColors.neutralLight : backgroundColor),
       onPressed: onPressFunction,

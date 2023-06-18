@@ -113,6 +113,7 @@ class JoblineTheme {
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(30)),
         ),
+        textStyle: JoblineTextStyle.buttonSmall,
         minimumSize: const Size(145, 54),
       ),
     );
@@ -128,7 +129,8 @@ class JoblineTheme {
         side: const BorderSide(
           color: JoblineColors.primaryColor,
         ),
-        minimumSize: const Size(145, 54),
+        textStyle: JoblineTextStyle.buttonSmall,
+        minimumSize: const Size(145, 45),
       ),
     );
   }

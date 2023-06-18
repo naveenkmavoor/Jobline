@@ -5,11 +5,13 @@ class CurrentTimeline {
   final Timeline? timeline;
   final List<Steps>? steps;
   final int? numberOfSteps;
+  final String? email;
 
   CurrentTimeline({
     this.timeline,
     this.steps,
     this.numberOfSteps,
+    this.email,
   });
 
   CurrentTimeline.fromJson(Map<String, dynamic> json)
@@ -19,12 +21,14 @@ class CurrentTimeline {
         steps = (json['steps'] as List?)
             ?.map((dynamic e) => Steps.fromJson(e as Map<String, dynamic>))
             .toList(),
-        numberOfSteps = json['numberOfSteps'] as int?;
+        numberOfSteps = json['numberOfSteps'] as int?,
+        email = json['email'] as String?;
 
   Map<String, dynamic> toJson() => {
         'timeline': timeline?.toJson(),
         'steps': steps?.map((e) => e.toJson()).toList(),
-        'numberOfSteps': numberOfSteps
+        'numberOfSteps': numberOfSteps,
+        'email': email,
       };
 
   CurrentTimeline copyWith({
@@ -32,11 +36,13 @@ class CurrentTimeline {
     List<Steps>? steps,
     List<Status>? status,
     int? numberOfSteps,
+    String? email,
   }) {
     return CurrentTimeline(
       timeline: timeline ?? this.timeline,
       steps: steps ?? this.steps,
       numberOfSteps: numberOfSteps ?? this.numberOfSteps,
+      email: email ?? this.email,
     );
   }
 }

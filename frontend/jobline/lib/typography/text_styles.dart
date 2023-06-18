@@ -107,6 +107,14 @@ class JoblineTextStyle {
   }
 
   /// Button Text Style
+  static TextStyle get buttonSmall {
+    return _baseTextStyle.copyWith(
+      fontSize: 14,
+      fontWeight: JoblineFontWeight.medium,
+    );
+  }
+
+  /// Button Text Style
   static TextStyle get button {
     return _baseTextStyle.copyWith(
       fontSize: 18,

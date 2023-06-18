@@ -6,6 +6,41 @@ String? getUserName() {
   return name;
 }
 
+Map<String, String?> getUserInfo() {
+  final name = Hive.box('appBox').get('name');
+  final email = Hive.box('appBox').get('email');
+  final id = Hive.box('appBox').get('id');
+  final role = Hive.box('appBox').get('accType');
+  return {'name': name, 'email': email, 'id': id, 'accType': role};
+}
+
+String? getUserRole() {
+  final role = Hive.box('appBox').get('accType') as String?;
+  return role ?? '';
+}
+
+String? getTimelineId() {
+  final timelineId = Hive.box('appBox').get('timelineId');
+  return timelineId;
+}
+
+putVerified(bool isVerified) {
+  Hive.box('appBox').put('isVerified', isVerified);
+}
+
+bool isVerified() {
+  final isVerified = Hive.box('appBox').get('isVerified', defaultValue: false);
+  return isVerified;
+}
+
+putTimelineId(String timelineId) {
+  Hive.box('appBox').put('timelineId', timelineId);
+}
+
+deleteTimelineId() {
+  Hive.box('appBox').delete('timelineId');
+}
+
 CurrentTimeline getDummyTimelineData() {
   return CurrentTimeline.fromJson({
     "timeline": {

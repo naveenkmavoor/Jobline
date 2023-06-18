@@ -163,7 +163,8 @@ class ManageCandidateCubit extends Cubit<ManageCandidateState> {
     ));
   }
 
-  Future<void> addCandidate(String stepId, List<String> emails) async {
+  Future<void> addCandidate(
+      String stepId, List<String> emails, String link) async {
     emit(state.copyWith(sendLoading: true));
     final List<Status> statusList = state.copyTimelineDetails!.steps!
         .firstWhere((step) => step.id == stepId)
@@ -175,7 +176,8 @@ class ManageCandidateCubit extends Cubit<ManageCandidateState> {
       final resultEmailLists = await repository.addCandidateRepo(
           timelineId: state.currentTimelineDetails!.timeline!.id!,
           stepId: stepId,
-          emails: newList);
+          emails: emails,
+          link: link);
       emit(state.copyWith(
           searchQueryTimeline: state.searchQueryTimeline!.copyWith(
               steps: state.searchQueryTimeline!.steps!

@@ -5,7 +5,7 @@ enum TimelineMode { edit, create, general }
 class TimelineState extends Equatable {
   final Timelines? timelines;
   final CurrentTimeline? currentTimeline;
-  final bool stateUpdate;
+  final bool isWithdrawn;
   final bool isButtonLoading;
   final bool focusLastTextField;
   final bool isPageLoading;
@@ -26,7 +26,7 @@ class TimelineState extends Equatable {
       this.isPageLoading = false,
       this.isTimelineSuccess = false,
       this.isButtonLoading = false,
-      this.stateUpdate = false});
+      this.isWithdrawn = false});
 
   TimelineState copyWith(
       {Timelines? timelines,
@@ -39,28 +39,29 @@ class TimelineState extends Equatable {
       TimelineMode? timelineMode,
       bool? isTimelineSuccess,
       bool? isButtonLoading,
-      bool? stateUpdate}) {
+      bool? isWithdrawn}) {
     return TimelineState(
         timelines: timelines ?? this.timelines,
         error: error,
         focusLastTextField: focusLastTextField ?? false,
         isDeleteButtonLoading: isDeleteButtonLoading ?? false,
-        successMssg: successMssg ?? this.successMssg,
+        successMssg: successMssg,
         timelineMode: timelineMode ?? this.timelineMode,
         currentTimeline: currentTimeline ?? this.currentTimeline,
         isPageLoading: isPageLoading ?? false,
         isTimelineSuccess: isTimelineSuccess ?? false,
         isButtonLoading: isButtonLoading ?? false,
-        stateUpdate: stateUpdate ?? this.stateUpdate);
+        isWithdrawn: isWithdrawn ?? false);
   }
 
   @override
   List<Object?> get props => [
         timelines,
-        stateUpdate,
+        isWithdrawn,
         currentTimeline,
         isDeleteButtonLoading,
         isPageLoading,
+        error,
         timelineMode,
         successMssg,
         isButtonLoading

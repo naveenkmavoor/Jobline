@@ -1,10 +1,15 @@
 import 'dart:html';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:jobline/shared/data/timeline/models/current_timeline.dart';
+import 'package:jobline/shared/data/timeline/models/job.dart';
 import 'package:jobline/shared/data/timeline/models/timeline.dart';
+import 'package:jobline/shared/utility.dart';
+import 'package:jobline/widgets/stacked_avatars.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
@@ -20,10 +25,63 @@ class TimelineMainBody extends StatelessWidget {
   final PageController? pageController;
   const TimelineMainBody({super.key, this.pageController});
 
+  void _buildShareLinkAlertBox(BuildContext context, String? timelineId) {
+    final link = '${window.location.hostname}/timeline/$timelineId';
+    bool isCopied = false;
+    final textTheme = Theme.of(context).textTheme;
+    customAlertDialog(
+        context: context,
+        actions: [],
+        title: 'Share link',
+        body: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+          return Row(
+            children: [
+              Expanded(
+                  child: Container(
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(
+                    12,
+                  ),
+                  color: JoblineColors.primaryColor.withOpacity(0.1),
+                ),
+                child: Row(children: [
+                  Text(
+                    link,
+                    style: textTheme.labelSmall,
+                  ),
+                  const Spacer(),
+                  CustomButton(
+                      backgroundColor: JoblineColors.white,
+                      elevation: 3,
+                      onPressFunction: () {
+                        Clipboard.setData(ClipboardData(text: link));
+                        setState(() {
+                          isCopied = true;
+                        });
+                        // customSnackBar(
+                        //     context: context,
+                        //     snackBarType: SnackBarType.success,
+                        //     title: "Link copied!");
+                      },
+                      child: Text(isCopied ? '✓ Copied!' : ' Copy link',
+                          style: TextStyle(
+                              color: isCopied
+                                  ? JoblineColors.green
+                                  : JoblineColors.primaryColor))),
+                ]),
+              )),
+            ],
+          );
+        }));
+  }
+
   void _buildDeletecustomAlertDialog(
       BuildContext context, TimelineCubit timelineCubit, Steps step) {
     customAlertDialog(
         context: context,
+        title: "Delete phase?",
         actions: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -58,35 +116,19 @@ class TimelineMainBody extends StatelessWidget {
                         current.isDeleteButtonLoading,
                     builder: (context, state) {
                       return state.isDeleteButtonLoading
-                          ? const CircularProgressIndicator()
-                          : Text(
+                          ? const CircularProgressIndicator(
+                              color: JoblineColors.white,
+                            )
+                          : const Text(
                               'DELETE',
-                              style: Theme.of(context).textTheme.labelLarge!,
                             );
                     },
                   ))
             ],
           )
         ],
-        body: Column(
-          children: [
-            const Icon(
-              Icons.info_outline_rounded,
-              color: JoblineColors.primaryColor,
-              size: 50,
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Text(
-              'Delete phase?',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            const Text('Are you sure you want to delete this phase?')
-          ],
+        body: const Column(
+          children: [Text('Are you sure you want to delete this phase?')],
         ));
   }
 
@@ -172,12 +214,23 @@ class TimelineMainBody extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   TextField(
-                                    autofocus: autoFocusLastTextField,
                                     maxLines: 1,
+                                    autofocus: autoFocusLastTextField,
                                     controller: _titleController,
                                     maxLength: 50,
+                                    onChanged: (val) {
+                                      context
+                                          .read<TimelineCubit>()
+                                          .updatePhaseTitle(
+                                              order: e.order!, title: val);
+                                    },
                                     decoration: const InputDecoration(
                                         border: InputBorder.none),
+                                  ),
+                                  TextField(
+                                    maxLines: 5,
+                                    controller: _descriptionController,
+                                    maxLength: 200,
                                     onChanged: (val) {
                                       context
                                           .read<TimelineCubit>()
@@ -185,19 +238,8 @@ class TimelineMainBody extends StatelessWidget {
                                               order: e.order!,
                                               description: val);
                                     },
-                                  ),
-                                  TextField(
-                                    maxLines: 5,
-                                    controller: _descriptionController,
-                                    maxLength: 200,
                                     decoration: const InputDecoration(
                                         border: InputBorder.none),
-                                    onChanged: (val) {
-                                      context
-                                          .read<TimelineCubit>()
-                                          .updatePhaseTitle(
-                                              order: e.order!, title: val);
-                                    },
                                   ),
                                   Align(
                                     alignment: Alignment.bottomRight,
@@ -332,8 +374,8 @@ class TimelineMainBody extends StatelessWidget {
           );
         }
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 80.0),
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 220.0),
           child: Column(children: listTimelineTile),
         );
       },
@@ -352,7 +394,16 @@ class TimelineMainBody extends StatelessWidget {
           return const Center(
             child: Text('Something went wrong!'),
           );
-        } else if (state.currentTimeline != null) {
+        } else if (state.currentTimeline != null &&
+            (state.currentTimeline?.email != null)) {
+          if (getUserRole() == 'candidate' &&
+              state.timelineMode != TimelineMode.general) {
+            if (!isVerified())
+              Future.delayed(Duration(seconds: 2)).then((value) =>
+                  _buildInviteConfirmationAlertBox(
+                      context, state.currentTimeline!));
+          }
+
           List<Widget> listTimelineTile = const [];
           final currentTimeline = state.currentTimeline;
           listTimelineTile = currentTimeline!.steps!.map(
@@ -360,6 +411,17 @@ class TimelineMainBody extends StatelessWidget {
               final isFirst = e.order == 0 ? true : false;
               final isLast = e.order == currentTimeline.steps!.length - 1;
               final isStart = e.order! % 2 == 0 ? true : false;
+              Color indicatorColor = JoblineColors.neutralLight;
+              Color borderColor = JoblineColors.lightOrange.withOpacity(0.21);
+              if (getUserRole() == 'candidate' && isVerified()) {
+                final val = e.status?.firstWhere(
+                    (element) => element.email == getUserInfo()['email'],
+                    orElse: () => Status());
+                if (val?.id != null) {
+                  indicatorColor = JoblineColors.lightOrange;
+                  borderColor = JoblineColors.lightOrange;
+                }
+              }
               return Column(
                 children: [
                   TimelineTile(
@@ -369,10 +431,7 @@ class TimelineMainBody extends StatelessWidget {
                     isLast: isLast,
                     indicatorStyle: IndicatorStyle(
                       width: 20,
-                      color:
-                          state.timelineMode == TimelineMode.general && isFirst
-                              ? JoblineColors.lightOrange
-                              : JoblineColors.neutralLight,
+                      color: indicatorColor,
                     ),
                     beforeLineStyle: const LineStyle(
                       color: JoblineColors.neutralLight,
@@ -381,59 +440,85 @@ class TimelineMainBody extends StatelessWidget {
                     endChild: isStart
                         ? null
                         : Container(
+                            padding: const EdgeInsets.all(18.0),
                             decoration: BoxDecoration(
                                 color:
                                     JoblineColors.lightOrange.withOpacity(0.21),
+                                border: Border.all(color: borderColor),
                                 borderRadius: BorderRadius.circular(15)),
                             constraints: const BoxConstraints(
                                 minHeight: 80, minWidth: 80),
-                            child: Padding(
-                              padding: const EdgeInsets.all(18.0),
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Text(e.name!,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge!),
-                                    Text(e.description!,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium!
-                                            .copyWith(
-                                                color:
-                                                    JoblineColors.lightGrey)),
-                                  ]),
-                            ),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(e.name!,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge!),
+                                  const SizedBox(
+                                    height: 10.0,
+                                  ),
+                                  Text(e.description!,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(
+                                              color: JoblineColors.lightGrey)),
+                                  const SizedBox(
+                                    height: 50.0,
+                                  ),
+                                  if ((isVerified() &&
+                                          getUserRole() == 'candidate') ||
+                                      (getUserRole() == 'recruiter' &&
+                                          getTimelineId() == null))
+                                    StackedAvatars(
+                                      radius: 10,
+                                      avatars: e.status!
+                                          .map((e) => e.email!)
+                                          .toList(),
+                                    )
+                                ]),
                           ),
                     startChild: isStart
                         ? Container(
+                            padding: const EdgeInsets.all(18.0),
                             decoration: BoxDecoration(
                                 color:
                                     JoblineColors.lightOrange.withOpacity(0.21),
+                                border: Border.all(color: borderColor),
                                 borderRadius: BorderRadius.circular(15)),
                             constraints: const BoxConstraints(
                                 minHeight: 80, minWidth: 80),
-                            child: Padding(
-                              padding: const EdgeInsets.all(18.0),
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Text(e.name!,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge!),
-                                    Text(e.description!,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium!
-                                            .copyWith(
-                                                color:
-                                                    JoblineColors.lightGrey)),
-                                  ]),
-                            ),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(e.name!,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge!),
+                                  const SizedBox(
+                                    height: 10.0,
+                                  ),
+                                  Text(e.description!,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(
+                                              color: JoblineColors.lightGrey)),
+                                  const SizedBox(
+                                    height: 50.0,
+                                  ),
+                                  if ((isVerified() &&
+                                          getUserRole() == 'candidate') ||
+                                      (getUserRole() == 'recruiter' &&
+                                          getTimelineId() == null))
+                                    StackedAvatars(
+                                      radius: 10,
+                                      avatars: e.status!
+                                          .map((e) => e.email!)
+                                          .toList(),
+                                    )
+                                ]),
                           )
                         : null,
                   ),
@@ -468,28 +553,37 @@ class TimelineMainBody extends StatelessWidget {
             },
           ).toList();
 
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 80.0),
+          return Container(
+            margin: const EdgeInsets.symmetric(horizontal: 220.0),
             child: Column(children: listTimelineTile),
           );
         } else {
-          return Column(
-            children: [
-              const Text('You currently do not have any job timelines.'),
-              const SizedBox(
-                height: 15,
-              ),
-              CustomButton(
-                  onPressFunction: () {
-                    buildAlertDialogBox(context, context.read<TimelineCubit>());
-                  },
-                  child: const Text(
-                    'CREATE TIMELINE',
-                  )),
-              const SizedBox(
-                height: 24,
-              ),
-            ],
+          if (getUserRole() == 'candidate') {
+            return const Center(
+              child: Text('You Are not invited to any timeline :('),
+            );
+          }
+          return Align(
+            alignment: Alignment.center,
+            child: Column(
+              children: [
+                const Text('You currently do not have any job timelines.'),
+                const SizedBox(
+                  height: 15,
+                ),
+                CustomButton(
+                    onPressFunction: () {
+                      buildAlertDialogBox(
+                          context, context.read<TimelineCubit>());
+                    },
+                    child: const Text(
+                      'CREATE TIMELINE',
+                    )),
+                const SizedBox(
+                  height: 24,
+                ),
+              ],
+            ),
           );
         }
       },
@@ -523,7 +617,8 @@ class TimelineMainBody extends StatelessWidget {
         },
         buildWhen: (previous, current) =>
             previous.isPageLoading != current.isPageLoading ||
-            previous.timelineMode != current.timelineMode,
+            previous.timelineMode != current.timelineMode ||
+            previous.isWithdrawn != current.isWithdrawn,
         builder: (context, state) {
           return Stack(
             children: [
@@ -534,180 +629,212 @@ class TimelineMainBody extends StatelessWidget {
                       ? const SizedBox.shrink()
                       : Row(
                           children: [
-                            Expanded(
-                              child: Container(
-                                  padding: const EdgeInsets.all(15),
-                                  height: 100,
-                                  width: 50,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(
-                                          color: JoblineColors.neutralLight)),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
+                            if (!state.isWithdrawn)
+                              Expanded(
+                                child: Container(
+                                    padding: const EdgeInsets.all(15),
+                                    height: 100,
+                                    width: 50,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                            color: JoblineColors.neutralLight)),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                                state.currentTimeline?.timeline
+                                                        ?.company ??
+                                                    '',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyLarge),
+                                            Text(
                                               state.currentTimeline?.timeline
-                                                      ?.company ??
-                                                  '',
+                                                      ?.jobTitle ??
+                                                  "",
                                               style: Theme.of(context)
                                                   .textTheme
-                                                  .bodyLarge),
-                                          Text(
-                                            state.currentTimeline?.timeline
-                                                    ?.jobTitle ??
-                                                "",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .displaySmall,
-                                          ),
-                                        ],
-                                      ),
-                                      const Padding(
-                                        padding: EdgeInsets.only(
-                                            left: 50.0, right: 19),
-                                        child: VerticalDivider(
-                                          indent: 11,
-                                          endIndent: 11,
-                                          color: JoblineColors.neutralLight,
-                                          thickness: 2,
+                                                  .displaySmall,
+                                            ),
+                                          ],
                                         ),
-                                      ),
-
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                              '${state.currentTimeline?.steps?.length ?? '0'} Phases'),
-                                          Text(
-                                            state.currentTimeline?.timeline
-                                                    ?.jobPostLink ??
-                                                '',
-                                            style: const TextStyle(
-                                                decoration:
-                                                    TextDecoration.underline),
+                                        const Padding(
+                                          padding: EdgeInsets.only(
+                                              left: 50.0, right: 19),
+                                          child: VerticalDivider(
+                                            indent: 11,
+                                            endIndent: 11,
+                                            color: JoblineColors.neutralLight,
+                                            thickness: 2,
                                           ),
-                                          Text(
-                                              '${Hive.box('appBox').get('email') ?? ''}')
-                                        ],
-                                      ),
-                                      //check whether edit mode or not; needs refactor
-                                      const Spacer(),
-                                      state.timelineMode == TimelineMode.edit
-                                          ? CustomButton(
-                                              onPressFunction: () {
-                                                context
-                                                    .read<TimelineCubit>()
-                                                    .updateTimeline(
-                                                        timelineCubit
-                                                            .state
-                                                            .currentTimeline!
-                                                            .steps!,
-                                                        timelineCubit
-                                                            .state
-                                                            .currentTimeline!
-                                                            .timeline!
-                                                            .id!);
-                                              },
-                                              child: BlocBuilder<TimelineCubit,
-                                                  TimelineState>(
-                                                buildWhen: (previous,
-                                                        current) =>
-                                                    previous.isButtonLoading !=
-                                                    current.isButtonLoading,
-                                                builder: (context, state) {
-                                                  return state.isButtonLoading
-                                                      ? const CircularProgressIndicator()
-                                                      : Text(
-                                                          'Save Timeline',
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .labelLarge!,
-                                                        );
+                                        ),
+
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                                '${state.currentTimeline?.steps?.length ?? '0'} Phases'),
+                                            Text(
+                                              state.currentTimeline?.timeline
+                                                      ?.jobPostLink ??
+                                                  '',
+                                              style: const TextStyle(
+                                                  decoration:
+                                                      TextDecoration.underline),
+                                            ),
+                                            Text(state.currentTimeline?.email ??
+                                                '')
+                                          ],
+                                        ),
+                                        //check whether edit mode or not; needs refactor
+                                        const Spacer(),
+                                        state.timelineMode == TimelineMode.edit
+                                            ? CustomButton(
+                                                onPressFunction: () {
+                                                  context
+                                                      .read<TimelineCubit>()
+                                                      .updateTimeline(
+                                                          timelineCubit
+                                                              .state
+                                                              .currentTimeline!
+                                                              .steps!,
+                                                          timelineCubit
+                                                              .state
+                                                              .currentTimeline!
+                                                              .timeline!
+                                                              .id!);
                                                 },
-                                              ))
-                                          : state.timelineMode ==
-                                                  TimelineMode.general
-                                              ? const SizedBox.shrink()
-                                              : Row(
-                                                  children: [
-                                                    CustomButton(
-                                                        onPressFunction: () {
-                                                          pageController != null
-                                                              ? pageController!.nextPage(
-                                                                  duration: const Duration(
-                                                                      milliseconds:
-                                                                          500),
-                                                                  curve: Curves
-                                                                      .easeIn)
-                                                              : null;
-                                                        },
-                                                        child: Text(
-                                                            'MANAGE CANDIDATES',
-                                                            style: Theme.of(
-                                                                    context)
-                                                                .textTheme
-                                                                .labelLarge!)),
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                              .symmetric(
-                                                          horizontal: 8.0),
-                                                      child: CustomButton(
+                                                child: BlocBuilder<
+                                                    TimelineCubit,
+                                                    TimelineState>(
+                                                  buildWhen: (previous,
+                                                          current) =>
+                                                      previous
+                                                          .isButtonLoading !=
+                                                      current.isButtonLoading,
+                                                  builder: (context, state) {
+                                                    return state.isButtonLoading
+                                                        ? const CircularProgressIndicator()
+                                                        : const Text(
+                                                            'Save Timeline',
+                                                          );
+                                                  },
+                                                ))
+                                            : state.timelineMode ==
+                                                    TimelineMode.general
+                                                ? const SizedBox.shrink()
+                                                : getUserRole() == 'candidate'
+                                                    ? CustomButton(
                                                         onPressFunction: () {
                                                           context
                                                               .read<
                                                                   TimelineCubit>()
-                                                              .timelineModeChange(
-                                                                  TimelineMode
-                                                                      .edit);
+                                                              .withdrawTimeline();
                                                         },
-                                                        child: const Row(
-                                                          children: [
-                                                            Icon(
-                                                              Icons
-                                                                  .mode_edit_outline_outlined,
-                                                              color:
-                                                                  JoblineColors
-                                                                      .white,
+                                                        child: BlocBuilder<
+                                                            TimelineCubit,
+                                                            TimelineState>(
+                                                          buildWhen: (previous,
+                                                                  current) =>
+                                                              previous
+                                                                  .isButtonLoading !=
+                                                              current
+                                                                  .isButtonLoading,
+                                                          builder:
+                                                              (context, state) {
+                                                            return state
+                                                                    .isButtonLoading
+                                                                ? const CircularProgressIndicator()
+                                                                : const Text(
+                                                                    'WITHDRAW FROM TIMELINE',
+                                                                  );
+                                                          },
+                                                        ))
+                                                    : Row(
+                                                        children: [
+                                                          CustomButton(
+                                                              onPressFunction:
+                                                                  () {
+                                                                pageController!
+                                                                    .nextPage(
+                                                                  duration: Duration(
+                                                                      milliseconds:
+                                                                          500),
+                                                                  curve: Curves
+                                                                      .easeIn,
+                                                                );
+                                                              },
+                                                              child: const Text(
+                                                                'MANAGE CANDIDATES',
+                                                              )),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .symmetric(
+                                                                    horizontal:
+                                                                        8.0),
+                                                            child: CustomButton(
+                                                              onPressFunction:
+                                                                  () {
+                                                                context
+                                                                    .read<
+                                                                        TimelineCubit>()
+                                                                    .timelineModeChange(
+                                                                        TimelineMode
+                                                                            .edit);
+                                                              },
+                                                              child: const Row(
+                                                                children: [
+                                                                  Icon(
+                                                                    Icons
+                                                                        .mode_edit_outline_outlined,
+                                                                    color: JoblineColors
+                                                                        .white,
+                                                                  ),
+                                                                  SizedBox(
+                                                                    width: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    'EDIT TIMELINE',
+                                                                  )
+                                                                ],
+                                                              ),
                                                             ),
-                                                            SizedBox(
-                                                              width: 8,
-                                                            ),
-                                                            Text(
-                                                              'EDIT TIMELINE',
-                                                            )
-                                                          ],
-                                                        ),
+                                                          ),
+                                                          IconButton(
+                                                            onPressed: () {
+                                                              _buildShareLinkAlertBox(
+                                                                  context,
+                                                                  state
+                                                                      .currentTimeline
+                                                                      ?.timeline
+                                                                      ?.id);
+                                                              // Share.share(
+                                                              //     'Jobline link : ${window.location.hostname}/timeline/${state.currentTimeline?.timeline?.id}',
+                                                              //     subject:
+                                                              //         'You have been invited to ${state.currentTimeline?.timeline?.company} as ${state.currentTimeline?.timeline?.jobTitle} tap the link : ${window.location.hostname}/timeline/${state.currentTimeline?.timeline?.id}');
+                                                            },
+                                                            icon: const Icon(
+                                                                Icons.share),
+                                                          ),
+                                                        ],
                                                       ),
-                                                    ),
-                                                    IconButton(
-                                                      onPressed: () {
-                                                        Share.share(
-                                                            'Jobline link : ${window.location.hostname}/timeline/${state.currentTimeline?.timeline?.id}',
-                                                            subject:
-                                                                'You have been invited to ${state.currentTimeline?.timeline?.company} as ${state.currentTimeline?.timeline?.jobTitle} tap the link : ${window.location.hostname}/timeline/${state.currentTimeline?.timeline?.id}');
-                                                      },
-                                                      icon: const Icon(
-                                                          Icons.share),
-                                                    ),
-                                                  ],
-                                                ),
 
-                                      const SizedBox(
-                                        width: 10,
-                                      )
-                                    ],
-                                  )),
-                            ),
+                                        const SizedBox(
+                                          width: 10,
+                                        )
+                                      ],
+                                    )),
+                              ),
                           ],
                         ),
                   const SizedBox(
@@ -734,5 +861,45 @@ class TimelineMainBody extends StatelessWidget {
         },
       ),
     );
+  }
+
+  void _buildInviteConfirmationAlertBox(
+      BuildContext context, CurrentTimeline currentTimeline) {
+    customAlertDialog(
+        context: context,
+        title: 'Confirm your invite',
+        actions: [
+          Align(
+            alignment: Alignment.bottomRight,
+            child: CustomButton(
+                onPressFunction: () {
+                  context.read<TimelineCubit>().verifyCandidate();
+                  context.pop();
+                },
+                child: const Text(
+                  'CONFIRM',
+                )),
+          )
+        ],
+        body: Column(
+          children: [
+            RichText(
+                text: TextSpan(
+              text: 'Is ',
+              children: [
+                TextSpan(
+                    text:
+                        '${currentTimeline.timeline?.jobTitle} @ ${currentTimeline.timeline?.company} ',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge!
+                        .copyWith(color: JoblineColors.primaryColor)),
+                const TextSpan(
+                  text: 'the job you applied for?',
+                ),
+              ],
+            ))
+          ],
+        ));
   }
 }

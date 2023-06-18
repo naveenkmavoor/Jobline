@@ -71,4 +71,25 @@ class TimelineApi {
       rethrow;
     }
   }
+
+  Future<Response> withdrawTimelineApi(String jobId) async {
+    try {
+      final Response response =
+          await dioClient.get('/api/user/withdraw/$jobId');
+
+      return response;
+    } catch (err) {
+      rethrow;
+    }
+  }
+
+  Future<Response> verifyCandidateApi(String jobId) async {
+    try {
+      final Response response = await dioClient.get('/api/user/getUser/$jobId');
+
+      return response;
+    } catch (err) {
+      rethrow;
+    }
+  }
 }

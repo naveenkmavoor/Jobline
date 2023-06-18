@@ -1,7 +1,6 @@
-import 'dart:js';
+import 'dart:html';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jobline/colors.dart';
@@ -100,10 +99,10 @@ class ManageCandidateBody extends StatelessWidget {
                           final text = account.name ?? account.email ?? '';
                           return Card(
                             child: ExpansionTile(
-                              title: Text('Expandable Tile'),
+                              title: const Text('Expandable Tile'),
                               onExpansionChanged: (value) {},
                               children: <Widget>[
-                                Padding(
+                                const Padding(
                                   padding: EdgeInsets.all(8.0),
                                   child: TextField(
                                     decoration: InputDecoration(
@@ -115,7 +114,7 @@ class ManageCandidateBody extends StatelessWidget {
                                   alignment: Alignment.centerRight,
                                   child: TextButton(
                                     onPressed: () {},
-                                    child: Text('OK'),
+                                    child: const Text('OK'),
                                   ),
                                 ),
                               ],
@@ -362,7 +361,10 @@ class ManageCandidateBody extends StatelessWidget {
                         return CustomButton(
                             onPressFunction: () {
                               if (!state.sendLoading) {
-                                manageCubit.addCandidate(steps.id!, _values);
+                                final link =
+                                    '${window.location.hostname}/timeline/${manageCubit.state.currentTimelineDetails?.timeline?.id}';
+                                manageCubit.addCandidate(
+                                    steps.id!, _values, link);
                               }
                             },
                             child: state.sendLoading
@@ -378,7 +380,7 @@ class ManageCandidateBody extends StatelessWidget {
         }));
   }
 
-  Widget _buildHeader(TextTheme textTheme) => Row(
+  Widget _buildHeader(BuildContext context, TextTheme textTheme) => Row(
         children: [
           IconButton(
               onPressed: () {
@@ -386,6 +388,14 @@ class ManageCandidateBody extends StatelessWidget {
                   pageController!.previousPage(
                       duration: const Duration(milliseconds: 500),
                       curve: Curves.easeIn);
+                  context.read<TimelineCubit>().getTimelineWithId(
+                      id: context
+                          .read<TimelineCubit>()
+                          .state
+                          .currentTimeline!
+                          .timeline!
+                          .id!,
+                      timelineMode: TimelineMode.create);
                 }
               },
               icon: const Icon(Icons.arrow_back_rounded)),
@@ -412,7 +422,7 @@ class ManageCandidateBody extends StatelessWidget {
     final manageCubit = context.read<ManageCandidateCubit>();
     return Column(
       children: [
-        Text(steps.name!),
+        Text(steps.name!, style: Theme.of(context).textTheme.bodyLarge),
         Expanded(
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -555,8 +565,8 @@ class ManageCandidateBody extends StatelessWidget {
       child: BlocProvider(
         create: (context) => ManageCandidateCubit(_manageCandidateRepository)
           ..getCurrentTimeline(
-              // context.read<TimelineCubit>().state.currentTimeline!),
-              getDummyTimelineData()),
+              context.read<TimelineCubit>().state.currentTimeline!),
+        // getDummyTimelineData()),
         child: Builder(builder: (ctx) {
           return BlocListener<ManageCandidateCubit, ManageCandidateState>(
             listenWhen: (previous, current) =>
@@ -578,6 +588,7 @@ class ManageCandidateBody extends StatelessWidget {
             child: Column(
               children: [
                 _buildHeader(
+                  context,
                   textTheme,
                 ),
                 Flexible(

@@ -3,7 +3,8 @@ import 'package:jobline/colors.dart';
 
 class CustomAvatar extends StatelessWidget {
   final String name;
-  const CustomAvatar({super.key, required this.name});
+  final double? radius;
+  const CustomAvatar({super.key, required this.name, this.radius});
   static const List<Color> avatarColors = [
     Colors.red,
     Colors.blue,
@@ -23,6 +24,7 @@ class CustomAvatar extends StatelessWidget {
     final avatarColor = getAvatarColor(name);
     final textTheme = Theme.of(context).textTheme;
     return CircleAvatar(
+      radius: radius,
       backgroundColor: avatarColor,
       child: Text(
         name[0].toUpperCase(),
