@@ -1,7 +1,7 @@
 const Step = require("../models/Step");
 const TimeLine = require("../models/Timeline");
 const Status = require("../models/Status");
-
+const User = require("../models/User")
 const createTimeLine = async (req, res, next) => {
   try {
     const id = req.user.id;
@@ -102,6 +102,11 @@ const getTimeLine = async (req, res, next) => {
       next("TimelineId is incorrect.");
     }
 
+    const recruiterId = timeline.recruiterId;
+    const recruiter = await User.findById(recruiterId);
+
+    const email = recruiter.email;
+
     let steps = await Step.find({ timelineId });
     const status = await Status.find({ timelineId });
 
@@ -114,11 +119,11 @@ const getTimeLine = async (req, res, next) => {
       );
       step.status = stepStatus; // Assign the statuses to the step
     }
-    
+
     const numberOfSteps = steps.length;
     const jobLink = timeline.jobPostLink;
 
-    res.status(201).send({ timeline, steps, numberOfSteps, jobLink });
+    res.status(201).send({ timeline, steps, numberOfSteps, jobLink, email });
   } catch (error) {
     next(error);
   }

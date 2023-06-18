@@ -17,6 +17,7 @@ const addUserStatus = async (req, res, next) => {
     }
 
     const emails = req.body.emails;
+    const link = req.body.link;
     const statusPromises = emails.map(async (email) => {
       const existingStatus = await Status.findOne({ email });
 
@@ -36,7 +37,7 @@ const addUserStatus = async (req, res, next) => {
     const response = {
       body: {
         name: "Jobline Here",
-        intro: `Congratulations! You have been invited to join the recruitment timeline for the position of ${timeline.jobTitle} at ${timeline.company}. You can view your progress and any updates on your application through Jobline. We wish you all the best on this journey!`,
+        intro: `Congratulations! You have been invited to join the recruitment timeline for the position of ${timeline.jobTitle} at ${timeline.company}. You can view your progress and any updates on your application through this link - ${link}. We wish you all the best on this journey!`,
       },
     };
     const mail = MailGenerator.generate(response);
