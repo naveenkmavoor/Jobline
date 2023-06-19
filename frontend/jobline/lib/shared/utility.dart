@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:jobline/shared/data/timeline/models/current_timeline.dart';
 
@@ -24,6 +25,11 @@ String? getTimelineId() {
   return timelineId;
 }
 
+String getEmail() {
+  final email = Hive.box('appBox').get('email', defaultValue: '');
+  return email;
+}
+
 putVerified(bool isVerified) {
   Hive.box('appBox').put('isVerified', isVerified);
 }
@@ -39,6 +45,11 @@ putTimelineId(String timelineId) {
 
 deleteTimelineId() {
   Hive.box('appBox').delete('timelineId');
+}
+
+bool isAuthenticated() {
+  final isAuth = Hive.box('appBox').get('token') != null;
+  return isAuth;
 }
 
 CurrentTimeline getDummyTimelineData() {

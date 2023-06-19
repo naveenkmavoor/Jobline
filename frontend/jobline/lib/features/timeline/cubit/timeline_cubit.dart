@@ -56,6 +56,7 @@ class TimelineCubit extends Cubit<TimelineState> {
       final jobId = state.timelines!.timelines![index].id;
       final currentTimeline = await timelineRepository.getTimelineRepo(jobId!);
       emit(state.copyWith(
+        timelineMode: TimelineMode.create,
         currentTimeline: currentTimeline,
       ));
     } catch (err) {
@@ -200,8 +201,8 @@ class TimelineCubit extends Cubit<TimelineState> {
       //! comment the below line when the changes is done in the backend
       final currentTimeline = await timelineRepository.getTimelineRepo(jobId);
       emit(state.copyWith(
-          currentTimeline:
-              state.currentTimeline?.copyWith(steps: currentTimeline.steps),
+          currentTimeline: state.currentTimeline?.copyWith(
+              steps: currentTimeline.steps, email: currentTimeline.email),
           successMssg: "Successfully saved the timeline!",
           timelineMode: TimelineMode.create));
       // getAllTimeline();

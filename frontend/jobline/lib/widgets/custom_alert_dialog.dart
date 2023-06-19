@@ -43,21 +43,19 @@ Future<void> customAlertDialog({
                         ),
                       )
                     : const SizedBox(),
-                Align(
-                  alignment: Alignment.topRight,
-                  child: IconButton(
-                    iconSize: 20,
-                    icon: const Icon(
-                      Icons.close,
-                      color: JoblineColors.neutral25,
-                    ),
-                    onPressed: () {
-                      if (popFunction != null) {
-                        popFunction();
-                      }
-                      ctx.pop();
-                    },
+                const Spacer(),
+                IconButton(
+                  iconSize: 20,
+                  icon: const Icon(
+                    Icons.close,
+                    color: JoblineColors.neutral25,
                   ),
+                  onPressed: () {
+                    if (popFunction != null) {
+                      popFunction();
+                    }
+                    ctx.pop();
+                  },
                 ),
               ],
             ),

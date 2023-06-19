@@ -3,7 +3,9 @@ import 'package:jobline/features/timeline/timeline_create.dart';
 import 'package:jobline/screens/authentication/signin/login_page.dart';
 import 'package:jobline/screens/authentication/signup/sign_up.dart';
 import 'package:jobline/screens/error/error.dart';
+import 'package:jobline/screens/redirect/redirect_screen.dart';
 import 'package:jobline/screens/splash/splash.dart';
+import 'package:jobline/shared/utility.dart';
 
 /// Shared paths / urls used across the app
 class ScreenPaths {
@@ -12,6 +14,7 @@ class ScreenPaths {
   static const String signup = '/signup';
   static const String timeLine = '/timeline/:timelineId';
   static const String settings = 'settings';
+  static const String redirect = '/redirect';
   // static String wonderDetails(WonderType type, {int tabIndex = 0}) => '/wonder/${type.name}?t=$tabIndex';
   // static String video(String id) => '/video/$id';
   // static String highlights(WonderType type) => '/highlights/${type.name}';
@@ -29,10 +32,11 @@ final GoRouter router = GoRouter(
       name: 'home',
       path: ScreenPaths.home,
       redirect: (context, state) {
-        bool isAuthenticate = 2 == 2;
-        // if (isAuthenticate) {
-        //   return "/${ScreenPaths.timeLine}";
-        // }
+        if (isAuthenticated()) {
+          return "/${ScreenPaths.redirect}}";
+        } else {
+          return "/${ScreenPaths.login}";
+        }
 
 //refer sample code for redirect
         //     redirect: (context, state) {
@@ -50,7 +54,6 @@ final GoRouter router = GoRouter(
         //     }
         //   }
         // }
-        return "/${ScreenPaths.login}";
       },
       builder: (context, state) => const SplashScreen(),
       routes: [
@@ -62,6 +65,11 @@ final GoRouter router = GoRouter(
       ],
     ),
     GoRoute(
+      name: 'redirect',
+      path: ScreenPaths.redirect,
+      builder: (context, state) => const RedirectScreen(),
+    ),
+    GoRoute(
       name: 'signup',
       path: ScreenPaths.signup,
       builder: (context, state) => const SignUpScreen(),
@@ -70,7 +78,7 @@ final GoRouter router = GoRouter(
       name: 'timeline',
       path: ScreenPaths.timeLine,
       builder: (context, state) => TimelineCreate(
-        timelineId: state.pathParameters['timelineId'],
+        timelineId: state.pathParameters['timelineId'] ?? " ",
       ),
     ),
   ],

@@ -30,6 +30,9 @@ class _NavRailExampleState extends State<TimelineCreate> {
   double groupAlignment = -1.0;
   late TimelineCubit timelineCubit;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  final trigger = ValueNotifier<int>(0);
+
   String? title;
   String? companyName;
   String? jobLinktoPost;
@@ -53,8 +56,17 @@ class _NavRailExampleState extends State<TimelineCreate> {
   List<NavigationRailDestination> listNavigationRailDestination = const [];
   @override
   void initState() {
+    // trigger.addListener(() {
+    //   if (trigger.value < 2) {
+    //     setState(() {});
+    //     // pageViewcontroller.animateTo(trigger.value.toDouble(),
+    //     //     duration: const Duration(milliseconds: 500), curve: Curves.easeIn);
+    //   }
+    // });
     timelineCubit = TimelineCubit(TimelineRepository());
-    if (widget.timelineId != null && widget.timelineId != " ") {
+    if (widget.timelineId != " " && getUserRole() != 'recruiter') {
+      timelineCubit.getAllTimeline();
+
       putTimelineId(widget.timelineId!);
       timelineCubit.getTimelineWithId(id: widget.timelineId!);
     } else {
@@ -64,9 +76,16 @@ class _NavRailExampleState extends State<TimelineCreate> {
   }
 
   @override
+  void dispose() {
+    pageViewcontroller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isGeneralMode = widget.timelineId != null && widget.timelineId != " ";
+    final isGeneralMode =
+        widget.timelineId != " " && getUserRole() != 'recruiter';
     final isRecruiter = getUserRole() == 'recruiter';
     return RepositoryProvider.value(
         value: (_) => TimelineRepository(),
@@ -145,13 +164,20 @@ class _NavRailExampleState extends State<TimelineCreate> {
                                               mainAxisAlignment:
                                                   MainAxisAlignment.spaceAround,
                                               children: [
-                                                Expanded(
-                                                    child: TextButton(
-                                                        onPressed: () {
-                                                          context.pop();
-                                                        },
-                                                        child: const Text(
-                                                            'CANCEL'))),
+                                                // Expanded(
+                                                //     child: TextButton(
+                                                //         onPressed: () {
+                                                //           context.pop();
+                                                //           timelineCubit
+                                                //               .getTimeline(
+                                                //                   index);
+                                                //           setState(() {
+                                                //             _selectedIndex =
+                                                //                 index;
+                                                //           });
+                                                //         },
+                                                //         child: const Text(
+                                                //             'CANCEL'))),
                                                 CustomButton(
                                                     onPressFunction: () {
                                                       timelineCubit.updateTimeline(
@@ -159,6 +185,7 @@ class _NavRailExampleState extends State<TimelineCreate> {
                                                               .steps!,
                                                           state.currentTimeline!
                                                               .timeline!.id!);
+                                                      context.pop();
                                                     },
                                                     child: const Text('SAVE'))
                                               ],
@@ -190,6 +217,7 @@ class _NavRailExampleState extends State<TimelineCreate> {
                                     }
                                     timelineCubit.getTimeline(index);
                                     setState(() {
+                                      trigger.value = 0;
                                       _selectedIndex = index;
                                     });
                                   },
@@ -200,6 +228,60 @@ class _NavRailExampleState extends State<TimelineCreate> {
                                       if (isRecruiter)
                                         CustomButton(
                                           onPressFunction: () {
+                                            if (timelineCubit
+                                                    .state.timelineMode ==
+                                                TimelineMode.edit) {
+                                              customAlertDialog(
+                                                  context: context,
+                                                  actions: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceAround,
+                                                      children: [
+                                                        CustomButton(
+                                                            onPressFunction:
+                                                                () {
+                                                              timelineCubit.updateTimeline(
+                                                                  state
+                                                                      .currentTimeline!
+                                                                      .steps!,
+                                                                  state
+                                                                      .currentTimeline!
+                                                                      .timeline!
+                                                                      .id!);
+                                                              context.pop();
+                                                            },
+                                                            child: const Text(
+                                                                'SAVE'))
+                                                      ],
+                                                    )
+                                                  ],
+                                                  body: Column(
+                                                    children: [
+                                                      const Icon(
+                                                        Icons
+                                                            .info_outline_rounded,
+                                                        color: JoblineColors
+                                                            .primaryColor,
+                                                        size: 50,
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 30,
+                                                      ),
+                                                      Text(
+                                                        'Save changes?',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodyLarge,
+                                                      ),
+                                                      const Text(
+                                                          'Your unsaved changes will be lost.\n Save changes before closing?')
+                                                    ],
+                                                  ));
+
+                                              return;
+                                            }
                                             buildAlertDialogBox(
                                                 context, timelineCubit);
                                           },
@@ -250,21 +332,35 @@ class _NavRailExampleState extends State<TimelineCreate> {
                           ),
                           const VerticalDivider(thickness: 1, width: 1),
                           Expanded(
-                              child: PageView(
-                            onPageChanged: (value) {},
-                            controller: pageViewcontroller,
-                            physics: const NeverScrollableScrollPhysics(),
-                            children: [
-                              TimelineMainBody(
-                                  pageController: pageViewcontroller),
-                              if (timelineCubit
-                                      .state.currentTimeline?.timeline !=
-                                  null)
-                                ManageCandidateBody(
-                                  pageController: pageViewcontroller,
-                                )
-                            ],
-                          ))
+                            child: ValueListenableBuilder(
+                                valueListenable: trigger,
+                                builder: (context, value, child) {
+                                  return value == 0
+                                      ? TimelineMainBody(
+                                          valueNotifier: trigger,
+                                        )
+                                      : ManageCandidateBody(
+                                          valueNotifier: trigger,
+                                        );
+                                }),
+                          )
+                          // Expanded(
+                          //     child: PageView(
+                          //   onPageChanged: (value) {},
+                          //   controller: pageViewcontroller,
+                          //   physics: const NeverScrollableScrollPhysics(),
+                          //   children: [
+                          //     TimelineMainBody(
+                          //       valueNotifier: trigger,
+                          //     ),
+                          //     if (timelineCubit
+                          //             .state.currentTimeline?.timeline !=
+                          //         null)
+                          //       ManageCandidateBody(
+                          //         valueNotifier: trigger,
+                          //       )
+                          //   ],
+                          // ))
                         ],
                       ))));
   }

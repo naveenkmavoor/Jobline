@@ -9,6 +9,7 @@ import 'package:jobline/shared/data/timeline/models/current_timeline.dart';
 import 'package:jobline/shared/data/timeline/models/job.dart';
 import 'package:jobline/shared/data/timeline/models/timeline.dart';
 import 'package:jobline/shared/utility.dart';
+import 'package:jobline/typography/font_weights.dart';
 import 'package:jobline/widgets/stacked_avatars.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:timeline_tile/timeline_tile.dart';
@@ -22,8 +23,8 @@ import 'package:jobline/widgets/custom_button.dart';
 import 'package:jobline/widgets/custom_snackbar.dart';
 
 class TimelineMainBody extends StatelessWidget {
-  final PageController? pageController;
-  const TimelineMainBody({super.key, this.pageController});
+  final ValueNotifier<int>? valueNotifier;
+  const TimelineMainBody({super.key, this.valueNotifier});
 
   void _buildShareLinkAlertBox(BuildContext context, String? timelineId) {
     final link = '${window.location.hostname}/timeline/$timelineId';
@@ -394,14 +395,36 @@ class TimelineMainBody extends StatelessWidget {
           return const Center(
             child: Text('Something went wrong!'),
           );
+        } else if (state.currentTimeline?.steps == null ||
+            state.currentTimeline!.steps!.isEmpty) {
+          return Center(
+            child: RichText(
+              text: TextSpan(
+                // Here is the explicit parent TextStyle
+
+                children: <TextSpan>[
+                  TextSpan(
+                      text: 'No timeline found. You can create by',
+                      style: Theme.of(context).textTheme.labelLarge),
+                  TextSpan(
+                      text: ' → Edit Timeline → Add new phase ',
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelLarge!
+                          .copyWith(fontWeight: JoblineFontWeight.semiBold)),
+                ],
+              ),
+            ),
+          );
         } else if (state.currentTimeline != null &&
             (state.currentTimeline?.email != null)) {
           if (getUserRole() == 'candidate' &&
               state.timelineMode != TimelineMode.general) {
-            if (!isVerified())
-              Future.delayed(Duration(seconds: 2)).then((value) =>
+            if (!isVerified()) {
+              Future.delayed(const Duration(seconds: 2)).then((value) =>
                   _buildInviteConfirmationAlertBox(
                       context, state.currentTimeline!));
+            }
           }
 
           List<Widget> listTimelineTile = const [];
@@ -593,6 +616,7 @@ class TimelineMainBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final timelineCubit = context.read<TimelineCubit>();
+
     final _scrollController = ScrollController();
 
     return // This is the main content.
@@ -692,7 +716,7 @@ class TimelineMainBody extends StatelessWidget {
                                                       TextDecoration.underline),
                                             ),
                                             Text(state.currentTimeline?.email ??
-                                                '')
+                                                getEmail())
                                           ],
                                         ),
                                         //check whether edit mode or not; needs refactor
@@ -764,14 +788,8 @@ class TimelineMainBody extends StatelessWidget {
                                                           CustomButton(
                                                               onPressFunction:
                                                                   () {
-                                                                pageController!
-                                                                    .nextPage(
-                                                                  duration: Duration(
-                                                                      milliseconds:
-                                                                          500),
-                                                                  curve: Curves
-                                                                      .easeIn,
-                                                                );
+                                                                valueNotifier!
+                                                                    .value = 1;
                                                               },
                                                               child: const Text(
                                                                 'MANAGE CANDIDATES',

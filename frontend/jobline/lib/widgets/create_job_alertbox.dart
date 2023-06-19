@@ -15,48 +15,44 @@ void buildAlertDialogBox(BuildContext context, TimelineCubit timelineCubit) {
   int? totalPhases;
   customAlertDialog(
       context: context,
+      title: 'About the job',
       actions: [
-        Container(
-          child: CustomButton(
-              onPressFunction: () {
-                _formKey.currentState!.save();
-                if (_formKey.currentState!.validate()) {
-                  timelineCubit.createJobTimeline(Job(
-                      companyName: companyName,
-                      jobLinktoPost: jobLinktoPost,
-                      title: title,
-                      totalPhases: totalPhases));
+        CustomButton(
+            onPressFunction: () {
+              _formKey.currentState!.save();
+              if (_formKey.currentState!.validate()) {
+                timelineCubit.createJobTimeline(Job(
+                    companyName: companyName,
+                    jobLinktoPost: jobLinktoPost,
+                    title: title,
+                    totalPhases: totalPhases));
+              }
+            },
+            child: BlocConsumer<TimelineCubit, TimelineState>(
+              bloc: timelineCubit,
+              listenWhen: (previous, current) =>
+                  previous.isButtonLoading != current.isButtonLoading,
+              listener: (context, state) {
+                if (!state.isButtonLoading) {
+                  context.pop();
                 }
               },
-              child: BlocConsumer<TimelineCubit, TimelineState>(
-                bloc: timelineCubit,
-                listenWhen: (previous, current) =>
-                    previous.isButtonLoading != current.isButtonLoading,
-                listener: (context, state) {
-                  if (!state.isButtonLoading) {
-                    context.pop();
-                  }
-                },
-                buildWhen: (previous, current) =>
-                    previous.isButtonLoading != current.isButtonLoading,
-                builder: (context, state) {
-                  return state.isButtonLoading
-                      ? const CircularProgressIndicator()
-                      : const Text(
-                          'CREATE TIMELINE',
-                        );
-                },
-              )),
-        ),
+              buildWhen: (previous, current) =>
+                  previous.isButtonLoading != current.isButtonLoading,
+              builder: (context, state) {
+                return state.isButtonLoading
+                    ? const CircularProgressIndicator()
+                    : const Text(
+                        'CREATE TIMELINE',
+                      );
+              },
+            )),
       ],
       body: Form(
         key: _formKey,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'About the job',
-              style: Theme.of(context).textTheme.displaySmall,
-            ),
             Text('Tell us the initial details before you create your timeline.',
                 style: Theme.of(context).textTheme.bodyLarge),
             TextFormField(

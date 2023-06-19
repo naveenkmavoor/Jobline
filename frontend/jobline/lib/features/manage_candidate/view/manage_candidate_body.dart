@@ -18,12 +18,14 @@ import 'package:material_tag_editor/tag_editor.dart';
 import 'package:jobline/shared/utility.dart';
 
 class ManageCandidateBody extends StatelessWidget {
-  final PageController? pageController;
-  final _manageCandidateRepository = ManageCandidateRepository();
+  final ValueNotifier<int>? valueNotifier;
+
   ManageCandidateBody({
     super.key,
-    this.pageController,
+    this.valueNotifier,
   });
+
+  final _manageCandidateRepository = ManageCandidateRepository();
 
   void _buildLeaveFeedBackDialogBox(
       BuildContext context, ManageCandidateCubit manageCubit) {
@@ -384,10 +386,9 @@ class ManageCandidateBody extends StatelessWidget {
         children: [
           IconButton(
               onPressed: () {
-                if (pageController != null) {
-                  pageController!.previousPage(
-                      duration: const Duration(milliseconds: 500),
-                      curve: Curves.easeIn);
+                if (valueNotifier != null) {
+                  valueNotifier!.value = 0;
+
                   context.read<TimelineCubit>().getTimelineWithId(
                       id: context
                           .read<TimelineCubit>()
@@ -509,7 +510,6 @@ class ManageCandidateBody extends StatelessWidget {
   }
 
   //build corosel slider container with searchbar seperated by arrow front and back
-//build list of phases with their name and number of candidates in each phase
   Widget _buildPhaseList() {
     return BlocBuilder<ManageCandidateCubit, ManageCandidateState>(
       buildWhen: (previous, current) =>
