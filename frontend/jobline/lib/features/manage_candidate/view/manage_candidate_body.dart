@@ -171,8 +171,8 @@ class ManageCandidateBody extends StatelessWidget {
               ),
               CustomButton(
                   onPressFunction: () {
-                    Navigator.of(context, rootNavigator: true).pop();
-                    _buildLeaveFeedBackDialogBox(context, manageCubit);
+                    // Navigator.of(context, rootNavigator: true).pop();
+                    // _buildLeaveFeedBackDialogBox(context, manageCubit);
                   },
                   child: const Text('LEAVE FEEDBACK')),
             ],
@@ -199,7 +199,7 @@ class ManageCandidateBody extends StatelessWidget {
                 Navigator.of(context, rootNavigator: true).pop();
                 //build another pop-up
                 context.pop();
-                _buildPhaseUpdateCompleteDialogBox(context, manageCubit);
+                // _buildPhaseUpdateCompleteDialogBox(context, manageCubit);
               }
             },
             buildWhen: (previous, current) =>
@@ -377,6 +377,16 @@ class ManageCandidateBody extends StatelessWidget {
                   )
                 ],
               ),
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12.0),
+                    color: JoblineColors.lightOrange.withOpacity(0.21)),
+                margin: const EdgeInsets.only(top: 16.0),
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                    'Tip: You can invite multiple/individual candidates by pressing enter or space after each email',
+                    style: textTheme.bodySmall),
+              )
             ],
           );
         }));

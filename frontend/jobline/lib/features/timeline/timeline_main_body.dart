@@ -395,7 +395,7 @@ class TimelineMainBody extends StatelessWidget {
           return const Center(
             child: Text('Something went wrong!'),
           );
-        } else if (state.currentTimeline?.steps == null ||
+        } else if (state.currentTimeline?.email != null &&
             state.currentTimeline!.steps!.isEmpty) {
           return Center(
             child: RichText(
@@ -900,6 +900,7 @@ class TimelineMainBody extends StatelessWidget {
           )
         ],
         body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             RichText(
                 text: TextSpan(

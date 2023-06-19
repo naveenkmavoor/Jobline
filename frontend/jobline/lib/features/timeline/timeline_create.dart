@@ -65,8 +65,6 @@ class _NavRailExampleState extends State<TimelineCreate> {
     // });
     timelineCubit = TimelineCubit(TimelineRepository());
     if (widget.timelineId != " " && getUserRole() != 'recruiter') {
-      timelineCubit.getAllTimeline();
-
       putTimelineId(widget.timelineId!);
       timelineCubit.getTimelineWithId(id: widget.timelineId!);
     } else {

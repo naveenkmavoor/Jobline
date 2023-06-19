@@ -57,7 +57,7 @@ class DioExceptions implements Exception {
     //   return Constants.somethingWentWrong;
     // }
 
-    return "Something went wrong!";
+    return "Something went wrong. Try again";
 
     // switch (error) {
     //   case 400:

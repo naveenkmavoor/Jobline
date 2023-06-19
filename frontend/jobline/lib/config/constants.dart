@@ -1,3 +1,3 @@
 class Constants {
-  static const String somethingWentWrong = "Something went wrong";
+  static const String somethingWentWrong = "Something went wrong. Try again.";
 }
