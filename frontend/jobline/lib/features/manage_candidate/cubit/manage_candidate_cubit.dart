@@ -166,43 +166,48 @@ class ManageCandidateCubit extends Cubit<ManageCandidateState> {
   Future<void> addCandidate(
       String stepId, List<String> emails, String link) async {
     emit(state.copyWith(sendLoading: true));
-    final List<Status> statusList = state.copyTimelineDetails!.steps!
-        .firstWhere((step) => step.id == stepId)
-        .status!;
-    final newList =
-        List<String>.from(statusList.map((element) => element.email));
-    newList.addAll(emails);
     try {
-      final resultEmailLists = await repository.addCandidateRepo(
-          timelineId: state.currentTimelineDetails!.timeline!.id!,
-          stepId: stepId,
-          emails: emails,
-          link: link);
-      emit(state.copyWith(
-          searchQueryTimeline: state.searchQueryTimeline!.copyWith(
-              steps: state.searchQueryTimeline!.steps!
-                  .map((e) => e.id == stepId
-                      ? e.copyWith(
-                          status: resultEmailLists
-                              .map((e) => e.copyWith())
-                              .toList())
-                      : e.copyWith())
-                  .toList()),
-          currentTimelineDetails: state.currentTimelineDetails!.copyWith(
-              steps: state.currentTimelineDetails!.steps!
-                  .map((e) => e.id == stepId
-                      ? e.copyWith(
-                          status: resultEmailLists
-                              .map((e) => e.copyWith())
-                              .toList())
-                      : e.copyWith())
-                  .toList()),
-          copyTimelineDetails: state.copyTimelineDetails!.copyWith(
-              steps: state.copyTimelineDetails!.steps!
-                  .map((e) => e.id == stepId
-                      ? e.copyWith(status: resultEmailLists.map((e) => e.copyWith()).toList())
-                      : e.copyWith())
-                  .toList())));
+      if (emails.isEmpty) {
+        emit(state.copyWith(
+            error:
+                "Please enter an email then press enter/space before pressing invite button"));
+      } else {
+        final List<Status> statusList = state.copyTimelineDetails!.steps!
+            .firstWhere((step) => step.id == stepId)
+            .status!;
+
+        final resultEmailLists = await repository.addCandidateRepo(
+            timelineId: state.currentTimelineDetails!.timeline!.id!,
+            stepId: stepId,
+            emails: emails,
+            link: link);
+        statusList.addAll(resultEmailLists);
+        emit(state.copyWith(
+            searchQueryTimeline: state.searchQueryTimeline!.copyWith(
+                steps: state.searchQueryTimeline!.steps!
+                    .map((e) => e.id == stepId
+                        ? e.copyWith(
+                            status:
+                                statusList.map((e) => e.copyWith()).toList())
+                        : e.copyWith())
+                    .toList()),
+            currentTimelineDetails: state.currentTimelineDetails!.copyWith(
+                steps: state.currentTimelineDetails!.steps!
+                    .map((e) => e.id == stepId
+                        ? e.copyWith(
+                            status:
+                                statusList.map((e) => e.copyWith()).toList())
+                        : e.copyWith())
+                    .toList()),
+            copyTimelineDetails: state.copyTimelineDetails!.copyWith(
+                steps: state.copyTimelineDetails!.steps!
+                    .map((e) => e.id == stepId
+                        ? e.copyWith(
+                            status:
+                                statusList.map((e) => e.copyWith()).toList())
+                        : e.copyWith())
+                    .toList())));
+      }
     } catch (err) {
       emit(state.copyWith(error: "Failed to add candidate. Please try again."));
     }
