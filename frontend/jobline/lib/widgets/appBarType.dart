@@ -9,6 +9,9 @@ import 'package:jobline/widgets/jobline_title.dart';
 
 enum AppBarTypes { login, signup, common, general }
 
+// This is the type used by the popup menu below.
+enum PopMenuItems { signOut }
+
 AppBar buildAppBarType(
     {required BuildContext context, required AppBarTypes type}) {
   switch (type) {
@@ -23,9 +26,22 @@ AppBar buildAppBarType(
           IconButton(onPressed: () {}, icon: const Icon(Icons.notifications)),
           Padding(
             padding: EdgeInsets.all(8.0),
-            child: CustomAvatar(
-              name: getUserName()!,
-            ),
+            child: PopupMenuButton<PopMenuItems>(
+                tooltip: 'Profile',
+                icon: CustomAvatar(
+                  name: getUserName()!,
+                ),
+                itemBuilder: (context) => [
+                      const PopupMenuItem<PopMenuItems>(
+                        value: PopMenuItems.signOut,
+                        child: Text('Sign out'),
+                      ),
+                    ],
+                onSelected: (PopMenuItems result) {
+                  if (result == PopMenuItems.signOut) {
+                    signOut(context);
+                  }
+                }),
           )
         ],
       );
@@ -99,4 +115,10 @@ AppBar buildAppBarType(
     default:
       return AppBar();
   }
+}
+
+void signOut(BuildContext context) {
+  clearDb().then((value) => context.goNamed(
+        'login',
+      ));
 }

@@ -83,7 +83,7 @@ class _NavRailExampleState extends State<TimelineCreate> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isGeneralMode =
-        widget.timelineId != " " && getUserRole() != 'recruiter';
+        widget.timelineId != " " && getUserRole() == 'candidate';
     final isRecruiter = getUserRole() == 'recruiter';
     return RepositoryProvider.value(
         value: (_) => TimelineRepository(),
