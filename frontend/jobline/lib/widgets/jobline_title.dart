@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jobline/colors.dart';
+import 'package:jobline/typography/font_weights.dart';
 import 'package:jobline/typography/text_styles.dart';
 
 class JoblineTitle extends StatelessWidget {
@@ -7,22 +8,26 @@ class JoblineTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return RichText(
       text: TextSpan(children: [
         TextSpan(
           text: 'Job',
-          style: JoblineTextStyle.mainHeadline,
+          style: textTheme.displayMedium!
+              .copyWith(fontWeight: JoblineFontWeight.black),
         ),
         TextSpan(
           text: 'line',
-          style: JoblineTextStyle.mainHeadline.copyWith(
+          style: textTheme.displayMedium!.copyWith(
+              fontWeight: JoblineFontWeight.black,
               decoration: TextDecoration.underline,
               decorationColor: JoblineColors.lightOrange),
         ),
         TextSpan(
           text: '.',
-          style: JoblineTextStyle.mainHeadline
-              .copyWith(color: JoblineColors.lightOrange),
+          style: textTheme.displayMedium!.copyWith(
+              fontWeight: JoblineFontWeight.black,
+              color: JoblineColors.lightOrange),
         ),
       ]),
     );

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:jobline/colors.dart';
 import 'package:jobline/typography/text_styles.dart';
 
-const _smallTextScaleFactor = 0.80;
+const _smallTextScaleFactor = 0.60;
+const _mediumTextScaleFactor = 0.80;
 
 /// Namespace for the Jobline [ThemeData].
 class JoblineTheme {
@@ -30,12 +31,27 @@ class JoblineTheme {
 
   /// `ThemeData` for Jobline UI for small screens.
   static ThemeData get small {
-    return standard.copyWith(textTheme: _smallTextTheme);
+    return standard.copyWith(
+        textTheme: _smallTextTheme,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: JoblineColors.white,
+            elevation: 0,
+            backgroundColor: JoblineColors.primaryColor,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(30)),
+            ),
+            textStyle: JoblineTextStyle.buttonSmall,
+            minimumSize: const Size(50, 40),
+          ),
+        ));
   }
 
   /// `ThemeData` for Jobline UI for medium screens.
   static ThemeData get medium {
-    return standard.copyWith(textTheme: _smallTextTheme);
+    return standard.copyWith(
+      textTheme: _mediumTextTheme,
+    );
   }
 
   static TextTheme get _textTheme {
@@ -53,6 +69,50 @@ class JoblineTheme {
       bodySmall: JoblineTextStyle.caption,
       labelSmall: JoblineTextStyle.overline,
       labelLarge: JoblineTextStyle.button,
+    );
+  }
+
+  static TextTheme get _mediumTextTheme {
+    return TextTheme(
+      displayLarge: JoblineTextStyle.headline1.copyWith(
+        fontSize: _textTheme.displayLarge!.fontSize! * _mediumTextScaleFactor,
+      ),
+      displayMedium: JoblineTextStyle.headline2.copyWith(
+        fontSize: _textTheme.displayMedium!.fontSize! * _mediumTextScaleFactor,
+      ),
+      displaySmall: JoblineTextStyle.headline3.copyWith(
+        fontSize: _textTheme.displaySmall!.fontSize! * _mediumTextScaleFactor,
+      ),
+      headlineMedium: JoblineTextStyle.headline4.copyWith(
+        fontSize: _textTheme.headlineMedium!.fontSize! * _mediumTextScaleFactor,
+      ),
+      headlineSmall: JoblineTextStyle.headline5.copyWith(
+        fontSize: _textTheme.headlineSmall!.fontSize! * _mediumTextScaleFactor,
+      ),
+      titleLarge: JoblineTextStyle.headline6.copyWith(
+        fontSize: _textTheme.titleLarge!.fontSize! * _mediumTextScaleFactor,
+      ),
+      titleMedium: JoblineTextStyle.subtitle1.copyWith(
+        fontSize: _textTheme.titleMedium!.fontSize! * _mediumTextScaleFactor,
+      ),
+      titleSmall: JoblineTextStyle.subtitle2.copyWith(
+        fontSize: _textTheme.titleSmall!.fontSize! * _mediumTextScaleFactor,
+      ),
+      bodyLarge: JoblineTextStyle.bodyText1.copyWith(
+        fontSize: _textTheme.bodyLarge!.fontSize! * _mediumTextScaleFactor,
+      ),
+      bodyMedium: JoblineTextStyle.bodyText2.copyWith(
+        fontSize: _textTheme.bodyMedium!.fontSize! * _mediumTextScaleFactor,
+      ),
+      bodySmall: JoblineTextStyle.caption.copyWith(
+        fontSize: _textTheme.bodySmall!.fontSize! * _mediumTextScaleFactor,
+      ),
+      labelSmall: JoblineTextStyle.overline.copyWith(
+        fontSize: _textTheme.labelSmall!.fontSize! * _mediumTextScaleFactor,
+      ),
+      labelLarge: JoblineTextStyle.button.copyWith(
+        fontSize: _textTheme.labelLarge!.fontSize! * _mediumTextScaleFactor,
+      ),
     );
   }
 

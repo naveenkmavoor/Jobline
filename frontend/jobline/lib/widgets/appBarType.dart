@@ -29,7 +29,7 @@ AppBar buildAppBarType(
             child: PopupMenuButton<PopMenuItems>(
                 tooltip: 'Profile',
                 icon: CustomAvatar(
-                  name: getUserName()!,
+                  name: getUserName() ?? ' ',
                 ),
                 itemBuilder: (context) => [
                       const PopupMenuItem<PopMenuItems>(

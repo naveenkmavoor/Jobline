@@ -52,6 +52,11 @@ bool isAuthenticated() {
   return isAuth;
 }
 
+String? getToken() {
+  final token = Hive.box('appBox').get('token');
+  return token;
+}
+
 Future<int> clearDb() async {
   final isClear = await Hive.box('appBox').clear();
   return isClear;

@@ -5,8 +5,14 @@ class ErrorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Oops! Something went wrong.'),
+    final textTheme = Theme.of(context).textTheme;
+    return Scaffold(
+      body: Center(
+        child: Text(
+          'Oops! page not found.',
+          style: textTheme.displayLarge,
+        ),
+      ),
     );
   }
 }

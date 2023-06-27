@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:colorize/colorize.dart';
 import 'package:dio/dio.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:jobline/shared/utility.dart';
 
 /// A simple dio log interceptor (mainly inspired by the built-in dio
 /// `LogInterceptor`), which has coloring features and json formatting
@@ -227,7 +228,7 @@ class AwesomeDioInterceptor extends QueuedInterceptor {
       if (err.response?.statusCode == 401 &&
           err.response?.data['msg'] == "Token Expired") {
         // Request to get the access token.
-        final String? accessToken = await getAccessToken();
+        final String? accessToken = getToken();
 
         // Create a Dio instance for network operations with specified configurations.
         final _dio = Dio()
@@ -355,11 +356,11 @@ class AwesomeDioInterceptor extends QueuedInterceptor {
     print("$token, $refresh");
   }
 
-  static String? getToken() {
-    if (_token != null) return _token;
-    _token = Hive.box('appBox').get("token");
-    return _token;
-  }
+  // static String? getToken() {
+  //   if (_token != null) return _token;
+  //   _token = Hive.box('appBox').get("token");
+  //   return _token;
+  // }
 
   static Future<String?> getRefreshToken() async {
     if (_refreshToken != null) return _refreshToken;
@@ -367,11 +368,11 @@ class AwesomeDioInterceptor extends QueuedInterceptor {
     return _refreshToken;
   }
 
-  static Future<String?> getAccessToken() async {
-    if (_token != null) return _token;
-    _token = await Hive.box('appBox').get("token");
-    return _token;
-  }
+  // static Future<String?> getAccessToken() async {
+  //   if (_token != null) return _token;
+  //   _token = await Hive.box('appBox').get("token");
+  //   return _token;
+  // }
 
   static resetToken() {
     _token = null;

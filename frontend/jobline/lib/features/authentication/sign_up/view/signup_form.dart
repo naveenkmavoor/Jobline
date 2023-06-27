@@ -199,7 +199,10 @@ class _SignUpFormState extends State<SignUpForm> {
                 // Header
                 Text(
                   'Sign up',
-                  style: Theme.of(context).textTheme.headlineLarge,
+                  style: Theme.of(context)
+                      .textTheme
+                      .displayLarge!
+                      .copyWith(fontSize: 33),
                 ),
                 const Text('Sign up to your Jobline account'),
                 const SizedBox(

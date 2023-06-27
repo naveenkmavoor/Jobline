@@ -78,7 +78,7 @@ final GoRouter router = GoRouter(
       name: 'timeline',
       path: ScreenPaths.timeLine,
       redirect: (context, state) {
-        if (!isAuthenticated()) {
+        if (!isAuthenticated() && state.pathParameters['timelineId'] == ' ') {
           return "/${ScreenPaths.login}";
         }
       },

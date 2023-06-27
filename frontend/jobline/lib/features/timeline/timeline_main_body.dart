@@ -4,14 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:jobline/shared/data/timeline/models/current_timeline.dart';
-import 'package:jobline/shared/data/timeline/models/job.dart';
-import 'package:jobline/shared/data/timeline/models/timeline.dart';
 import 'package:jobline/shared/utility.dart';
 import 'package:jobline/typography/font_weights.dart';
 import 'package:jobline/widgets/stacked_avatars.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
 import 'package:jobline/colors.dart';

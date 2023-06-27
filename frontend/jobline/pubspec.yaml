@@ -50,6 +50,8 @@ dependencies:
   share_plus: ^7.0.2
   flutter_highlight: ^0.7.0 
   jwt_decoder: ^2.0.1
+  flutter_screenutil: ^5.8.4
+
   material_tag_editor:
     path: packages/material_tag_editor
   

@@ -151,7 +151,10 @@ class _LoginFormState extends State<LoginForm> {
               children: [
                 Text(
                   'Sign in',
-                  style: Theme.of(context).textTheme.headlineLarge,
+                  style: Theme.of(context)
+                      .textTheme
+                      .displayLarge!
+                      .copyWith(fontSize: 33),
                 ),
                 const Text('Sign in to your Jobline account'),
                 const SizedBox(
