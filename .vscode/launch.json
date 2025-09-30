@@ -1,0 +1,74 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "jobline",
+            "cwd": "frontend/jobline",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "jobline (profile mode)",
+            "cwd": "frontend/jobline",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "jobline (release mode)",
+            "cwd": "frontend/jobline",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "fuzzy_search",
+            "cwd": "frontend/jobline/packages/fuzzy_search",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "timeline_tile",
+            "cwd": "frontend/jobline/packages/timeline_tile",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "timeline_tile (profile mode)",
+            "cwd": "frontend/jobline/packages/timeline_tile",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "timeline_tile (release mode)",
+            "cwd": "frontend/jobline/packages/timeline_tile",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "timeline_ui",
+            "cwd": "frontend/jobline/packages/timeline_ui",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "timeline_ui (profile mode)",
+            "cwd": "frontend/jobline/packages/timeline_ui",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "timeline_ui (release mode)",
+            "cwd": "frontend/jobline/packages/timeline_ui",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}
